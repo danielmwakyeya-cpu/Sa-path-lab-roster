@@ -54,6 +54,8 @@
   @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
   .theme-toggle{ font-family:var(--mono); font-size:12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.18); color:#cfd6e2; padding:5px 11px; border-radius:14px; cursor:pointer; }
   .theme-toggle:hover{ background:rgba(255,255,255,0.14); }
+  .sick-btn{ font-family:var(--sans); font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:5px; background:rgba(193,68,44,0.18); border:1px solid rgba(193,68,44,0.55); color:#f3c9bd; padding:5px 11px; border-radius:14px; cursor:pointer; }
+  .sick-btn:hover{ background:rgba(193,68,44,0.3); }
   nav.tabs{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
   nav.tabs button{ font-family:var(--sans); font-size:13.5px; font-weight:600; color:#cfd6e2; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); padding:7px 14px; border-radius:20px; cursor:pointer; transition:all .15s ease; position:relative; }
   nav.tabs button:hover{ background:rgba(255,255,255,0.12); }
@@ -112,7 +114,7 @@
   .col-toggle-btn{ margin-left:auto; font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--teal); background:transparent; border:1px solid var(--teal); padding:4px 10px; border-radius:12px; cursor:pointer; }
   .col-toggle-btn:hover{ background:rgba(47,125,122,0.1); }
   @media (max-width:700px){
-    table.roster:not(.showall) .col-admin, table.roster:not(.showall) .col-rdo, table.roster:not(.showall) .col-hol{ display:none; }
+    table.roster:not(.showall) .col-admin, table.roster:not(.showall) .col-rdo, table.roster:not(.showall) .col-hol, table.roster:not(.showall) .col-sick{ display:none; }
   }
   table.roster{ border-collapse:collapse; width:100%; min-width:980px; font-size:13px; }
   table.roster thead tr.h1 th{ background:var(--navy); color:#f0ede4; font-family:var(--mono); font-weight:600; font-size:11px; letter-spacing:.04em; padding:8px 6px; text-align:center; border-right:1px solid rgba(255,255,255,0.08); }
@@ -139,12 +141,14 @@
   td.col-admin .initial{ background:#eef1e4; color:var(--sage); }
   td.col-rdo .initial{ background:#f0f0f0; color:#7a7a7a; }
   td.col-hol .initial{ background:#fdeee0; color:var(--amber); }
+  td.col-sick .initial{ background:#f9dcd6; color:var(--today); }
   html[data-theme="dark"] td.col-on .initial{ background:#3a271e; }
   html[data-theme="dark"] td.col-lab .initial{ background:#1c2f2e; }
   html[data-theme="dark"] td.col-trs .initial{ background:#292339; }
   html[data-theme="dark"] td.col-admin .initial{ background:#232a1e; }
   html[data-theme="dark"] td.col-rdo .initial{ background:#26282c; }
   html[data-theme="dark"] td.col-hol .initial{ background:#332512; }
+  html[data-theme="dark"] td.col-sick .initial{ background:#3a1c17; }
 
   .staff-picker{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:18px; }
   .staff-picker h2{ margin:0 0 10px; font-size:14px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); }
@@ -380,6 +384,7 @@
     </div>
     <div class="headright">
       <span class="sync-badge offline noprint" id="syncBadge"><span class="sync-dot"></span><span id="syncLabel">Loading…</span></span>
+      <button class="sick-btn noprint" id="sickBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z"/><path d="M8 6.2v3.4"/><circle cx="8" cy="12" r=".65" fill="currentColor" stroke="none"/></svg>I'm sick today</button>
       <button class="theme-toggle noprint" id="themeToggle"></button>
       <div class="sub" id="rangeLabel">June – July 2026</div>
     </div>
@@ -485,10 +490,11 @@ const COLS = [
   {key:'ADMIN',   label:'ADMIN',time:'Admin',    cls:'col-admin', tag:'ADMIN'},
   {key:'RDO',     label:'RDO',  time:'Rostered day off', cls:'col-rdo', tag:'RDO'},
   {key:'HOLIDAYS',label:'HOL',  time:'Holidays / leave', cls:'col-hol', tag:'HOL'},
+  {key:'SICK',    label:'SICK', time:'Sick leave', cls:'col-sick', tag:'SICK'},
 ];
 const WEEKDAY_REQUIRED = ['ON','700_LAB','700_TRS','1500','2300'];
 const WEEKEND_REQUIRED = ['ON','700_LAB','1500','2300'];
-const TIME_MAP = {ON:[8,0], '700_LAB':[7,0], '700_TRS':[7,0], '800':[8,0], '900':[9,0], '1000':[10,0], '1100_TRS':[11,0], '1230':[12,30], '1500':[15,0], '2300':[23,0], ADMIN:[9,0], RDO:[9,0], HOLIDAYS:[9,0]};
+const TIME_MAP = {ON:[8,0], '700_LAB':[7,0], '700_TRS':[7,0], '800':[8,0], '900':[9,0], '1000':[10,0], '1100_TRS':[11,0], '1230':[12,30], '1500':[15,0], '2300':[23,0], ADMIN:[9,0], RDO:[9,0], HOLIDAYS:[9,0], SICK:[9,0]};
 
 let months = [];
 let allDays = [];
@@ -728,9 +734,9 @@ function dayGaps(d){
   return req.filter(k => d[k]==='' || d[k]===undefined);
 }
 function dayConflicts(d){
-  const off = new Set([...initials(d.RDO), ...initials(d.HOLIDAYS)].map(baseName).filter(Boolean));
+  const off = new Set([...initials(d.RDO), ...initials(d.HOLIDAYS), ...initials(d.SICK)].map(baseName).filter(Boolean));
   const working = new Set();
-  COLS.forEach(c=>{ if(c.key==='RDO'||c.key==='HOLIDAYS') return; initials(d[c.key]).forEach(n=>{ const b=baseName(n); if(b && b!=='/') working.add(b); }); });
+  COLS.forEach(c=>{ if(c.key==='RDO'||c.key==='HOLIDAYS'||c.key==='SICK') return; initials(d[c.key]).forEach(n=>{ const b=baseName(n); if(b && b!=='/') working.add(b); }); });
   return [...off].filter(n=>working.has(n));
 }
 function dayHasIssue(d){ return dayGaps(d).length>0 || dayConflicts(d).length>0; }
@@ -738,16 +744,16 @@ function describeConflicts(day, colKey, newValue){
   const names = initials(newValue).map(baseName).filter(n=>n && n!=='/');
   if(!names.length) return [];
   const msgs = [];
-  if(colKey!=='RDO' && colKey!=='HOLIDAYS'){
-    const off = new Set([...initials(day.RDO), ...initials(day.HOLIDAYS)].map(baseName));
-    names.forEach(n=>{ if(off.has(n)) msgs.push(n+' is marked RDO or Holiday on this day'); });
+  if(colKey!=='RDO' && colKey!=='HOLIDAYS' && colKey!=='SICK'){
+    const off = new Set([...initials(day.RDO), ...initials(day.HOLIDAYS), ...initials(day.SICK)].map(baseName));
+    names.forEach(n=>{ if(off.has(n)) msgs.push(n+' is marked RDO, Holiday, or Sick on this day'); });
     COLS.forEach(c=>{
-      if(c.key===colKey || c.key==='RDO' || c.key==='HOLIDAYS') return;
+      if(c.key===colKey || c.key==='RDO' || c.key==='HOLIDAYS' || c.key==='SICK') return;
       initials(day[c.key]).forEach(x=>{ const b=baseName(x); if(names.includes(b)) msgs.push(b+' is already rostered for '+c.time+' this day'); });
     });
   } else {
     COLS.forEach(c=>{
-      if(c.key==='RDO'||c.key==='HOLIDAYS') return;
+      if(c.key==='RDO'||c.key==='HOLIDAYS'||c.key==='SICK') return;
       initials(day[c.key]).forEach(x=>{ const b=baseName(x); if(names.includes(b)) msgs.push(b+' is rostered to work ('+c.time+') this day'); });
     });
   }
@@ -758,9 +764,9 @@ function holidaysUsed(staff){ return allDays.reduce((n,d)=> n + initials(d.HOLID
 function renderLegend(){
   const el = document.getElementById('legend');
   el.innerHTML = [
-    ['On-call','col-on'],['Lab bench','col-lab'],['Transport','col-trs'],['Admin','col-admin'],['RDO','col-rdo'],['Holidays/leave','col-hol']
+    ['On-call','col-on'],['Lab bench','col-lab'],['Transport','col-trs'],['Admin','col-admin'],['RDO','col-rdo'],['Holidays/leave','col-hol'],['Sick leave','col-sick']
   ].map(([label,cls])=>{
-    const colorMap = {'col-on':'#af5b3f','col-lab':'#2f7d7a','col-trs':'#5b4a8a','col-admin':'#6f8c5f','col-rdo':'#8a8a8a','col-hol':'#b8863f'};
+    const colorMap = {'col-on':'#af5b3f','col-lab':'#2f7d7a','col-trs':'#5b4a8a','col-admin':'#6f8c5f','col-rdo':'#8a8a8a','col-hol':'#b8863f','col-sick':'#c1442c'};
     return `<span class="lg-item"><span class="swatch" style="background:${colorMap[cls]}"></span>${label}</span>`;
   }).join('') + `<span class="lg-item" style="margin-left:auto;color:#c1442c;font-weight:600;">● today &nbsp; ${icon('warn','icon-warn')} coverage issue</span>`;
 }
@@ -1256,6 +1262,31 @@ async function editShift(month, date, colKey, colLabel){
   showToast(`Saved — ${colLabel} on ${dateLabel} now ${newValue || 'unassigned'}.`);
   render();
 }
+
+/* ---------------- QUICK ACTION: mark yourself sick today ---------------- */
+async function markSickToday(){
+  if(!state.me){ showToast('Set "Who are you" first, from My Roster.', 'error'); return; }
+  const today = allDays.find(d=>d.date===todayStr);
+  if(!today){ showToast("Today isn't in the loaded roster yet.", 'error'); return; }
+  const month = today.__month;
+  const monthDays = ROSTER[month].days;
+  const idx = monthDays.findIndex(x=>x.date===todayStr);
+  if(idx===-1) return;
+  const current = initials(monthDays[idx].SICK || '');
+  if(current.map(baseName).includes(state.me)){ showToast(`${state.me} is already marked sick for today.`); return; }
+  const dateLabel = new Date(todayStr+"T00:00:00").toLocaleDateString('en-AU',{weekday:'long', day:'numeric', month:'short'});
+  const proceed = await openModal({eyebrow:'Sick day', title:'Mark yourself sick today?', message:`${state.me} will be logged as sick for ${dateLabel}. This updates for everyone using the app.`, confirmLabel:'Mark sick'});
+  if(!proceed) return;
+  monthDays[idx].SICK = current.length ? current.concat(state.me).join('/') : state.me;
+  const stamp = new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'short'});
+  const noteText = `Sick day logged ${stamp} by ${state.me}`;
+  monthDays[idx].NOTES = monthDays[idx].NOTES ? monthDays[idx].NOTES + ' | ' + noteText : noteText;
+  rebuildDerived();
+  saveRoster();
+  showToast(`Marked ${state.me} sick for today. Feel better soon.`);
+  render();
+}
+document.getElementById('sickBtn').addEventListener('click', markSickToday);
 
 /* ---------------- IMPORT (.xlsx from lab manager) ---------------- */
 const COL_ORDER = ['ON','700_LAB','700_TRS','800','900','1000','1100_TRS','1230','1500','2300','ADMIN','RDO','HOLIDAYS','NOTES'];
