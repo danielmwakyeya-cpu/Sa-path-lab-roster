@@ -51,19 +51,24 @@
   .brand h1{ margin:0; font-size:19px; font-weight:700; letter-spacing:.01em; }
   .headright{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .brand .sub{ font-size:12px; color:#a9b3c4; font-family:var(--mono); }
-  .sync-badge{ font-family:var(--mono); font-size:10.5px; letter-spacing:.05em; padding:3px 9px; border-radius:12px; border:1px solid rgba(255,255,255,0.18); color:#c9d1de; display:inline-flex; align-items:center; gap:5px; }
+  .sync-badge{ width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.18); display:inline-flex; align-items:center; justify-content:center; }
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
   .sync-dot{ width:7px; height:7px; border-radius:50%; background:#8a8a8a; display:inline-block; }
   .sync-badge.saved .sync-dot{ background:var(--sage); }
   .sync-badge.saving .sync-dot{ background:var(--amber); animation:pulse 1s ease-in-out infinite; }
   .sync-badge.offline .sync-dot{ background:#8a8a8a; }
   .sync-badge.error .sync-dot{ background:var(--today); }
   @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
-  .theme-toggle{ font-family:var(--mono); font-size:12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.18); color:#cfd6e2; padding:5px 11px; border-radius:14px; cursor:pointer; }
-  .theme-toggle:hover{ background:rgba(255,255,255,0.14); }
-  .sick-btn{ font-family:var(--sans); font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:5px; background:rgba(193,68,44,0.18); border:1px solid rgba(193,68,44,0.55); color:#f3c9bd; padding:5px 11px; border-radius:14px; cursor:pointer; }
-  .sick-btn:hover{ background:rgba(193,68,44,0.3); }
-  .install-btn{ font-family:var(--sans); font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:5px; background:rgba(47,125,122,0.18); border:1px solid rgba(47,125,122,0.55); color:#bfe3e0; padding:5px 11px; border-radius:14px; cursor:pointer; }
-  .install-btn:hover{ background:rgba(47,125,122,0.3); }
+  .quick-wrap{ position:relative; }
+  .fab-btn{ width:28px; height:28px; border-radius:50%; background:var(--amber); color:#20180c; border:none; font-size:16px; font-weight:700; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+  .fab-btn:hover{ filter:brightness(1.08); }
+  .fab-btn[aria-expanded="true"]{ transform:rotate(45deg); }
+  .quick-menu{ position:absolute; top:calc(100% + 8px); right:0; background:var(--navy); border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:6px; display:none; flex-direction:column; gap:2px; min-width:190px; z-index:60; box-shadow:0 10px 30px rgba(0,0,0,0.35); }
+  .quick-menu.open{ display:flex; }
+  .quick-menu-item{ all:unset; box-sizing:border-box; cursor:pointer; display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; font-family:var(--sans); font-size:12.5px; font-weight:600; color:#e2e6ee; white-space:nowrap; }
+  .quick-menu-item:hover{ background:rgba(255,255,255,0.08); }
+  .quick-menu-item.sick{ color:#f3c9bd; }
+  .quick-menu-item.install{ color:#bfe3e0; }
   nav.tabs{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
   nav.tabs button{ font-family:var(--sans); font-size:13.5px; font-weight:600; color:#cfd6e2; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); padding:7px 14px; border-radius:20px; cursor:pointer; transition:all .15s ease; position:relative; }
   nav.tabs button:hover{ background:rgba(255,255,255,0.12); }
@@ -132,10 +137,11 @@
   table.roster tbody td.datecell{ text-align:left; padding-left:12px; font-family:var(--sans); font-weight:600; color:var(--navy); background:var(--panel); position:sticky; left:0; z-index:1; box-shadow:1px 0 0 var(--line); }
   table.roster tbody td.datecell .dow{ font-family:var(--mono); font-weight:400; color:var(--ink-soft); font-size:11px; margin-left:5px; }
   table.roster tbody tr:hover td{ background:rgba(184,134,63,0.08); }
-  table.roster tbody tr.weekend td{ background:rgba(0,0,0,0.03); }
+  table.roster tbody tr.weekend td{ background:rgba(0,0,0,0.045); }
+  html[data-theme="dark"] table.roster tbody tr.weekend td{ background:rgba(255,255,255,0.035); }
   table.roster tbody tr.weekend:hover td{ background:rgba(184,134,63,0.1); }
-  table.roster tbody tr.today td{ background:rgba(193,68,44,0.08); }
-  table.roster tbody tr.today td.datecell{ color:var(--today); }
+  table.roster tbody tr.today td{ background:rgba(193,68,44,0.1); }
+  table.roster tbody tr.today td.datecell{ color:var(--today); font-weight:700; box-shadow:inset 3px 0 0 var(--today), 1px 0 0 var(--line); }
   table.roster tbody tr.today td.datecell::before{ content:"● "; color:var(--today); }
   table.roster tbody tr.hasissue td.datecell::after{ content:''; display:inline-block; width:11px; height:11px; margin-left:5px; vertical-align:-1px; background:var(--danger); -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22none%22 stroke=%22black%22 stroke-width=%221.6%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z%22/><path d=%22M8 6.2v3.4%22/><circle cx=%228%22 cy=%2212%22 r=%22.65%22 fill=%22black%22 stroke=%22none%22/></svg>') center/contain no-repeat; mask:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22none%22 stroke=%22black%22 stroke-width=%221.6%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z%22/><path d=%22M8 6.2v3.4%22/><circle cx=%228%22 cy=%2212%22 r=%22.65%22 fill=%22black%22 stroke=%22none%22/></svg>') center/contain no-repeat; }
   td.notecell{ text-align:left; font-family:var(--sans); font-size:11.5px; color:var(--ink-soft); font-style:italic; white-space:normal; min-width:150px; max-width:200px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; cursor:help; }
@@ -391,10 +397,15 @@
       <h1>Roster</h1>
     </div>
     <div class="headright">
-      <span class="sync-badge offline noprint" id="syncBadge"><span class="sync-dot"></span><span id="syncLabel">Loading…</span></span>
-      <button class="sick-btn noprint" id="sickBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z"/><path d="M8 6.2v3.4"/><circle cx="8" cy="12" r=".65" fill="currentColor" stroke="none"/></svg>I'm sick today</button>
-      <button class="install-btn noprint" id="installBtn" style="display:none;"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 2v7.4M5.1 6.7 8 9.6l2.9-2.9"/><path d="M2.6 11.4v1.4A1.6 1.6 0 0 0 4.2 14.4h7.6a1.6 1.6 0 0 0 1.6-1.6v-1.4"/></svg>Install app</button>
-      <button class="theme-toggle noprint" id="themeToggle"></button>
+      <span class="sync-badge offline noprint" id="syncBadge" title="Loading…"><span class="sync-dot"></span><span id="syncLabel" class="sr-only">Loading…</span></span>
+      <div class="quick-wrap noprint">
+        <button class="fab-btn" id="quickActionsBtn" aria-haspopup="true" aria-expanded="false" aria-label="Quick actions">+</button>
+        <div class="quick-menu" id="quickMenu">
+          <button class="quick-menu-item sick" id="sickBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z"/><path d="M8 6.2v3.4"/><circle cx="8" cy="12" r=".65" fill="currentColor" stroke="none"/></svg>Mark sick today</button>
+          <button class="quick-menu-item install" id="installBtn" style="display:none;"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 2v7.4M5.1 6.7 8 9.6l2.9-2.9"/><path d="M2.6 11.4v1.4A1.6 1.6 0 0 0 4.2 14.4h7.6a1.6 1.6 0 0 0 1.6-1.6v-1.4"/></svg>Install app</button>
+          <button class="quick-menu-item theme-item" id="themeToggle"></button>
+        </div>
+      </div>
       <div class="sub" id="rangeLabel">June – July 2026</div>
     </div>
   </div>
@@ -575,6 +586,7 @@ function setSyncBadge(status, label){
   const el = document.getElementById('syncBadge');
   const lbl = document.getElementById('syncLabel');
   el.className = 'sync-badge noprint ' + status;
+  el.title = label;
   lbl.textContent = label;
 }
 
@@ -839,6 +851,23 @@ document.addEventListener('click', (e)=>{
   if(wrap && !wrap.contains(e.target)){
     document.getElementById('legend').classList.remove('open');
     document.getElementById('legendToggle').classList.remove('open');
+  }
+});
+const quickActionsBtn = document.getElementById('quickActionsBtn');
+const quickMenu = document.getElementById('quickMenu');
+quickActionsBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const isOpen = quickMenu.classList.toggle('open');
+  quickActionsBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+});
+quickMenu.addEventListener('click', ()=>{
+  setTimeout(()=>{ quickMenu.classList.remove('open'); quickActionsBtn.setAttribute('aria-expanded','false'); }, 60);
+});
+document.addEventListener('click', (e)=>{
+  const wrap = document.querySelector('.quick-wrap');
+  if(wrap && !wrap.contains(e.target)){
+    quickMenu.classList.remove('open');
+    quickActionsBtn.setAttribute('aria-expanded','false');
   }
 });
 function renderMonthSelect(){
