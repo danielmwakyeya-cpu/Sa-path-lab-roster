@@ -1,0 +1,15 @@
+{
+  "name": "SA Path Lab Roster",
+  "short_name": "Lab Roster",
+  "description": "Live-synced shift roster for the lab team",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#151f2e",
+  "theme_color": "#151f2e",
+  "orientation": "any",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

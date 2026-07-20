@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lab Roster</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#151f2e">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lab Roster">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -56,6 +62,8 @@
   .theme-toggle:hover{ background:rgba(255,255,255,0.14); }
   .sick-btn{ font-family:var(--sans); font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:5px; background:rgba(193,68,44,0.18); border:1px solid rgba(193,68,44,0.55); color:#f3c9bd; padding:5px 11px; border-radius:14px; cursor:pointer; }
   .sick-btn:hover{ background:rgba(193,68,44,0.3); }
+  .install-btn{ font-family:var(--sans); font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:5px; background:rgba(47,125,122,0.18); border:1px solid rgba(47,125,122,0.55); color:#bfe3e0; padding:5px 11px; border-radius:14px; cursor:pointer; }
+  .install-btn:hover{ background:rgba(47,125,122,0.3); }
   nav.tabs{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
   nav.tabs button{ font-family:var(--sans); font-size:13.5px; font-weight:600; color:#cfd6e2; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); padding:7px 14px; border-radius:20px; cursor:pointer; transition:all .15s ease; position:relative; }
   nav.tabs button:hover{ background:rgba(255,255,255,0.12); }
@@ -385,6 +393,7 @@
     <div class="headright">
       <span class="sync-badge offline noprint" id="syncBadge"><span class="sync-dot"></span><span id="syncLabel">Loading…</span></span>
       <button class="sick-btn noprint" id="sickBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z"/><path d="M8 6.2v3.4"/><circle cx="8" cy="12" r=".65" fill="currentColor" stroke="none"/></svg>I'm sick today</button>
+      <button class="install-btn noprint" id="installBtn" style="display:none;"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 2v7.4M5.1 6.7 8 9.6l2.9-2.9"/><path d="M2.6 11.4v1.4A1.6 1.6 0 0 0 4.2 14.4h7.6a1.6 1.6 0 0 0 1.6-1.6v-1.4"/></svg>Install app</button>
       <button class="theme-toggle noprint" id="themeToggle"></button>
       <div class="sub" id="rangeLabel">June – July 2026</div>
     </div>
@@ -727,6 +736,56 @@ function showToast(message, type){
   requestAnimationFrame(()=> el.classList.add('show'));
   setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(), 200); }, 3600);
 }
+
+/* ---------------- INSTALL TO HOME SCREEN (PWA) ---------------- */
+const INSTALL_PROMPTED_KEY = 'lab-roster-install-prompted';
+const installBtn = document.getElementById('installBtn');
+let deferredInstallPrompt = null;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+
+function iosInstallInstructions(){
+  return openModal({
+    eyebrow:'Install app',
+    title:'Add to your Home Screen',
+    message:'Tap the Share icon in Safari\'s toolbar, then scroll down and tap "Add to Home Screen". The roster will then open like a normal app, full-screen, with live sync still working.',
+    confirmLabel:'Got it',
+    hideCancel:true,
+  });
+}
+
+if(!isStandalone){
+  if(isIOS){
+    installBtn.style.display = '';
+    installBtn.addEventListener('click', iosInstallInstructions);
+    if(!localStorage.getItem(INSTALL_PROMPTED_KEY)){
+      localStorage.setItem(INSTALL_PROMPTED_KEY, '1');
+      setTimeout(iosInstallInstructions, 1200);
+    }
+  } else {
+    window.addEventListener('beforeinstallprompt', (e)=>{
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      installBtn.style.display = '';
+      if(!localStorage.getItem(INSTALL_PROMPTED_KEY)){
+        localStorage.setItem(INSTALL_PROMPTED_KEY, '1');
+        setTimeout(()=>{ showToast('Tip: tap "Install app" up top to add this to your home screen.'); }, 1200);
+      }
+    });
+    installBtn.addEventListener('click', async ()=>{
+      if(!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      if(choice.outcome === 'accepted'){ installBtn.style.display = 'none'; }
+      deferredInstallPrompt = null;
+    });
+  }
+}
+window.addEventListener('appinstalled', ()=>{ installBtn.style.display = 'none'; showToast('Installed — find it on your home screen.'); });
 
 /* ---------------- COVERAGE: gaps, conflicts, leave ---------------- */
 function dayGaps(d){
