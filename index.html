@@ -194,7 +194,13 @@
   .ss-detail{ color:var(--ink-soft); font-size:12.5px; }
   .ss-empty{ padding:30px 18px; text-align:center; color:var(--ink-soft); font-size:13.5px; }
   .tag-ON{ background:var(--clay); } .tag-LAB{ background:var(--teal); } .tag-TRS{ background:#5b4a8a; }
-  .tag-ADMIN{ background:var(--sage); } .tag-RDO{ background:#8a8a8a; } .tag-HOL{ background:var(--amber); }
+  .tag-ADMIN{ background:var(--sage); } .tag-RDO{ background:#8a8a8a; } .tag-HOL{ background:var(--amber); } .tag-SICK{ background:var(--today); }
+  .who-list{ margin-top:6px; display:flex; flex-direction:column; gap:1px; border-radius:8px; overflow:hidden; border:1px solid var(--line); }
+  .who-row{ display:flex; align-items:center; gap:8px; padding:6px 9px; background:var(--panel); font-size:12px; }
+  .who-row:nth-child(even){ background:#faf8f2; }
+  .who-name{ font-weight:600; color:var(--ink); flex:1; }
+  .who-time{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .who-empty{ font-size:12px; color:var(--ink-soft); font-style:italic; margin-top:6px; }
 
   .leave-card{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 18px; margin-bottom:14px; }
   .leave-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px; }
@@ -1119,7 +1125,12 @@ function renderCoverageView(){
 /* ---------------- SHARED helpers ---------------- */
 function whoElseOnDay(d, excludeName){
   const out = [];
-  COLS.forEach(c=>{ initials(d[c.key]).forEach(n=>{ const base = baseName(n); if(base && base!=='/' && base!==excludeName) out.push({name:n, tag:c.tag, time:c.time}); }); });
+  COLS.forEach(c=>{ initials(d[c.key]).forEach(n=>{ const base = baseName(n); if(base && base!=='/' && base!==excludeName) out.push({name:n, tag:c.tag, time:c.time, colKey:c.key}); }); });
+  out.sort((a,b)=>{
+    const ta = TIME_MAP[a.colKey] || [23,59];
+    const tb = TIME_MAP[b.colKey] || [23,59];
+    return (ta[0]*60+ta[1]) - (tb[0]*60+tb[1]);
+  });
   return out;
 }
 function myEntriesFor(name, dayList){
@@ -1215,12 +1226,14 @@ function renderMyView(){
       const chipsHtml = g.items.map(e=>`<span class="myc-chip ${e.tag}"><span class="tick"></span>${e.tag}${offTags.includes(e.tag)?'':' &middot; '+e.time}</span>`).join('');
       const noteDot = g.day.NOTES ? `<span class="myc-note-dot" data-gi="${gi}" title="Tap to view note">&#9670;</span>` : '';
       const others = whoElseOnDay(g.day, state.me);
-      const othersHtml = others.length ? others.map(o=>`<span class="wow-item"><span class="wow-tag tag-${o.tag}">${o.tag}</span>${o.name}</span>`).join('') : '<em>Nobody else logged for this day.</em>';
+      const othersHtml = others.length
+        ? `<div class="who-list">${others.map(o=>`<div class="who-row"><span class="wow-tag tag-${o.tag}">${o.tag}</span><span class="who-name">${o.name}</span><span class="who-time">${o.time}</span></div>`).join('')}</div>`
+        : '<div class="who-empty">Nobody else logged for this day.</div>';
       const swapButtons = g.items.map((e,ei)=>`<button class="swap-request-btn noprint" data-gi="${gi}" data-ei="${ei}">${icon('swap')}Request a swap: ${e.tag}${offTags.includes(e.tag)?'':' '+e.time}</button>`).join('');
       return `<div class="myc-card ${isToday?'today':''} ${isWeekend?'weekend':''} ${offOnly?'off':''}" data-gi="${gi}">
           <div class="myc-top"><span class="myc-date">${dateLabel}<span class="myc-dow">${g.dow}</span></span>${noteDot}</div>
           <div class="myc-shifts">${chipsHtml}</div>
-          <div class="myc-detail"><strong>Also on ${dateLabel}:</strong><br>${othersHtml}<div class="myc-swap-actions">${swapButtons}</div></div>
+          <div class="myc-detail"><strong>Also on ${dateLabel}:</strong>${othersHtml}<div class="myc-swap-actions">${swapButtons}</div></div>
         </div>`;
     }).join('');
     listHtml = `<div class="myc-list">${cards}</div>`;
