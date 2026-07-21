@@ -126,14 +126,6 @@
   .ics-btn{ background:var(--teal); }
   .ics-btn:hover{ filter:brightness(1.08); background:var(--teal); }
 
-  .legend-wrap{ position:relative; margin-bottom:18px; display:flex; }
-  .legend-toggle{ font-family:var(--mono); font-size:12px; font-weight:600; color:var(--ink-soft); background:var(--panel); border:1px solid var(--line); padding:6px 12px; border-radius:16px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
-  .legend-toggle:hover{ border-color:var(--teal); color:var(--teal); }
-  .legend-toggle .lt-chevron{ transition:transform .15s ease; }
-  .legend-toggle.open .lt-chevron{ transform:rotate(180deg); }
-  .legend{ position:absolute; top:calc(100% + 6px); left:0; z-index:40; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px 16px; display:none; flex-wrap:wrap; gap:8px 18px; align-items:center; font-size:12.5px; color:var(--ink-soft); box-shadow:0 8px 24px rgba(20,20,10,0.12); min-width:280px; }
-  .legend.open{ display:flex; }
-  .legend .lg-item{ display:flex; align-items:center; gap:6px; }
   .swatch{ width:11px; height:11px; border-radius:2px; display:inline-block; }
 
   .grid-wrap{ background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow-x:auto; box-shadow:0 1px 3px rgba(20,20,10,0.05); }
@@ -268,6 +260,34 @@
   .caret{ text-align:right; color:#c8c2b0; font-size:11px; }
   .my-empty{ padding:30px 18px; text-align:center; color:var(--ink-soft); font-size:13.5px; }
   .swap-request-btn{ margin-top:10px; font-family:var(--sans); font-size:11.5px; font-weight:600; background:var(--panel); color:var(--teal); border:1.3px solid var(--teal); padding:5px 10px; border-radius:14px; cursor:pointer; }
+
+  .myc-list{ display:flex; flex-direction:column; gap:10px; }
+  .myc-card{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:13px 15px; box-shadow:0 1px 2px rgba(20,20,30,0.04); position:relative; overflow:hidden; cursor:pointer; transition:box-shadow .15s ease; }
+  .myc-card::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--line); }
+  .myc-card:hover{ box-shadow:0 3px 10px rgba(20,20,30,0.08); }
+  .myc-card.today{ border-color:rgba(193,68,44,0.35); box-shadow:0 4px 14px rgba(193,68,44,0.1); }
+  .myc-card.today::before{ background:var(--today); }
+  .myc-card.weekend{ background:#faf8f2; }
+  .myc-card.off::before{ background:var(--amber); }
+  .myc-top{ display:flex; align-items:center; justify-content:space-between; }
+  .myc-date{ font-family:var(--display); font-size:16px; font-weight:600; color:var(--navy); }
+  .myc-card.today .myc-date{ color:var(--today); }
+  .myc-dow{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); letter-spacing:.06em; margin-left:7px; }
+  .myc-note-dot{ color:var(--amber); font-size:13px; cursor:pointer; padding:2px 4px; }
+  .myc-shifts{ display:flex; gap:6px; flex-wrap:wrap; margin-top:9px; }
+  .myc-chip{ display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; }
+  .myc-chip .tick{ width:5px; height:5px; border-radius:50%; }
+  .myc-chip.ON{ background:#f4e3d3; color:var(--clay); } .myc-chip.ON .tick{ background:var(--clay); }
+  .myc-chip.LAB{ background:#e2efee; color:var(--teal); } .myc-chip.LAB .tick{ background:var(--teal); }
+  .myc-chip.TRS{ background:#e9e5f3; color:#5b4a8a; } .myc-chip.TRS .tick{ background:#5b4a8a; }
+  .myc-chip.ADMIN{ background:#e7ede3; color:var(--sage); } .myc-chip.ADMIN .tick{ background:var(--sage); }
+  .myc-chip.RDO{ background:#ececec; color:#7a7a7a; } .myc-chip.RDO .tick{ background:#8a8a8a; }
+  .myc-chip.HOL{ background:#fdeee0; color:var(--amber); } .myc-chip.HOL .tick{ background:var(--amber); }
+  .myc-chip.SICK{ background:#f9dcd6; color:var(--today); } .myc-chip.SICK .tick{ background:var(--today); }
+  .myc-detail{ margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); font-size:12.5px; color:var(--ink-soft); display:none; }
+  .myc-card.open .myc-detail{ display:block; }
+  .myc-detail .wow-item{ display:inline-block; margin:2px 6px 2px 0; }
+  .myc-swap-actions{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin-top:8px; }
   .swap-request-btn:hover{ background:var(--teal); color:#fff; }
 
   .coverage-summary{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px; }
@@ -392,7 +412,7 @@
     .noprint, header.top{ display:none !important; }
     body{ background:#fff; }
     main{ padding:0; max-width:100%; }
-    .day-card, .my-list, .swap-list, .staff-schedule, .grid-wrap, .issue-list, .summary-table-wrap{ box-shadow:none; border-color:#ccc; }
+    .day-card, .my-list, .myc-card, .swap-list, .staff-schedule, .grid-wrap, .issue-list, .summary-table-wrap{ box-shadow:none; border-color:#ccc; }
   }
   @media (max-width:640px){
     .brand h1{font-size:16px;}
@@ -458,10 +478,6 @@
     <button class="save-btn" id="saveBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 2v7.4M5.1 6.7 8 9.6l2.9-2.9"/><path d="M2.6 11.4v1.4A1.6 1.6 0 0 0 4.2 14.4h7.6a1.6 1.6 0 0 0 1.6-1.6v-1.4"/></svg>Save updated app (.html)</button>
   </div>
   <div class="edit-hint noprint" id="editHint" style="display:none;">Editing is on — click any shift to log a correction or swap, and approve/deny pending swap requests in the Swap Log. This is for logging changes between roster updates, not for building the roster — the master schedule still comes from the lab manager's spreadsheet import above. Changes sync automatically and are visible to everyone using this app.</div>
-  <div class="legend-wrap noprint">
-    <button class="legend-toggle" id="legendToggle">Key <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="icon lt-chevron" aria-hidden="true"><path d="M4 6.2 8 10l4-3.8"/></svg></button>
-    <div class="legend" id="legend"></div>
-  </div>
 
   <section id="view-my"></section>
   <section id="view-day" style="display:none;"></section>
@@ -856,27 +872,6 @@ function describeConflicts(day, colKey, newValue){
 }
 function holidaysUsed(staff){ return allDays.reduce((n,d)=> n + initials(d.HOLIDAYS).filter(x=>baseName(x)===staff).length, 0); }
 
-function renderLegend(){
-  const el = document.getElementById('legend');
-  el.innerHTML = [
-    ['On-call','col-on'],['Lab bench','col-lab'],['Transport','col-trs'],['Admin','col-admin'],['RDO','col-rdo'],['Holidays/leave','col-hol'],['Sick leave','col-sick']
-  ].map(([label,cls])=>{
-    const colorMap = {'col-on':'#af5b3f','col-lab':'#2f7d7a','col-trs':'#5b4a8a','col-admin':'#6f8c5f','col-rdo':'#8a8a8a','col-hol':'#b8863f','col-sick':'#c1442c'};
-    return `<span class="lg-item"><span class="swatch" style="background:${colorMap[cls]}"></span>${label}</span>`;
-  }).join('') + `<span class="lg-item" style="margin-left:auto;color:#c1442c;font-weight:600;">● today &nbsp; ${icon('warn','icon-warn')} coverage issue</span>`;
-}
-document.getElementById('legendToggle').addEventListener('click', (e)=>{
-  e.stopPropagation();
-  document.getElementById('legend').classList.toggle('open');
-  document.getElementById('legendToggle').classList.toggle('open');
-});
-document.addEventListener('click', (e)=>{
-  const wrap = document.querySelector('.legend-wrap');
-  if(wrap && !wrap.contains(e.target)){
-    document.getElementById('legend').classList.remove('open');
-    document.getElementById('legendToggle').classList.remove('open');
-  }
-});
 const quickActionsBtn = document.getElementById('quickActionsBtn');
 const quickMenu = document.getElementById('quickMenu');
 quickActionsBtn.addEventListener('click', (e)=>{
@@ -1199,22 +1194,36 @@ function renderMyView(){
   entries.forEach(e=>{ tallyMap[e.tag] = (tallyMap[e.tag]||0) + 1; });
   const tagOrder = ['ON','LAB','TRS','ADMIN','RDO','HOL'];
   const tallyHtml = tagOrder.map(tag=>`<div class="tally-card"><div class="t-num">${tallyMap[tag]||0}</div><div class="t-lbl">${tag}</div></div>`).join('');
+
+  const offTags = ['RDO','HOL','SICK'];
+  const grouped = [];
+  const byDate = {};
+  entries.forEach(e=>{
+    if(!byDate[e.date]){ byDate[e.date] = { date:e.date, dow:e.dow, day:e.day, items:[] }; grouped.push(byDate[e.date]); }
+    byDate[e.date].items.push(e);
+  });
+
   let listHtml;
-  if(entries.length===0){
+  if(grouped.length===0){
     listHtml = `<div class="my-list"><div class="my-empty">No shifts found for ${state.me||'—'} in this range.</div></div>`;
   } else {
-    const rows = entries.map((e,i)=>{
-      const isToday = e.date===todayStr;
-      const dateLabel = new Date(e.date+"T00:00:00").toLocaleDateString('en-AU',{day:'2-digit',month:'short'});
-      const tagClass = {ON:'tag-ON',LAB:'tag-LAB',TRS:'tag-TRS',ADMIN:'tag-ADMIN',RDO:'tag-RDO',HOL:'tag-HOL'}[e.tag];
-      const others = whoElseOnDay(e.day, state.me);
+    const cards = grouped.map((g,gi)=>{
+      const isToday = g.date===todayStr;
+      const isWeekend = g.dow==='SAT' || g.dow==='SUN';
+      const offOnly = g.items.every(e=>offTags.includes(e.tag));
+      const dateLabel = new Date(g.date+"T00:00:00").toLocaleDateString('en-AU',{day:'2-digit',month:'short'});
+      const chipsHtml = g.items.map(e=>`<span class="myc-chip ${e.tag}"><span class="tick"></span>${e.tag}${offTags.includes(e.tag)?'':' &middot; '+e.time}</span>`).join('');
+      const noteDot = g.day.NOTES ? `<span class="myc-note-dot" data-gi="${gi}" title="Tap to view note">&#9670;</span>` : '';
+      const others = whoElseOnDay(g.day, state.me);
       const othersHtml = others.length ? others.map(o=>`<span class="wow-item"><span class="wow-tag tag-${o.tag}">${o.tag}</span>${o.name}</span>`).join('') : '<em>Nobody else logged for this day.</em>';
-      return `<div class="my-row ${isToday?'today':''}" data-idx="${i}">
-          <div class="my-row-top"><span class="ss-date">${dateLabel}<span class="dow">${e.dow}</span></span><span class="ss-shifttag ${tagClass}">${e.tag}</span><span class="ss-detail">${e.time}${e.raw.includes('(')?' &middot; '+e.raw.match(/\(.*?\)/)[0]:''}</span><span class="caret">▾</span></div>
-          <div class="my-row-detail"><strong>Also on ${dateLabel}:</strong><br>${othersHtml}${e.day.NOTES ? `<div style="margin-top:6px;"><strong>Note:</strong> ${e.day.NOTES}</div>` : ''}
-            <div><button class="swap-request-btn noprint" data-idx="${i}">${icon('swap')}Request a swap for this shift</button></div></div></div>`;
+      const swapButtons = g.items.map((e,ei)=>`<button class="swap-request-btn noprint" data-gi="${gi}" data-ei="${ei}">${icon('swap')}Request a swap: ${e.tag}${offTags.includes(e.tag)?'':' '+e.time}</button>`).join('');
+      return `<div class="myc-card ${isToday?'today':''} ${isWeekend?'weekend':''} ${offOnly?'off':''}" data-gi="${gi}">
+          <div class="myc-top"><span class="myc-date">${dateLabel}<span class="myc-dow">${g.dow}</span></span>${noteDot}</div>
+          <div class="myc-shifts">${chipsHtml}</div>
+          <div class="myc-detail"><strong>Also on ${dateLabel}:</strong><br>${othersHtml}<div class="myc-swap-actions">${swapButtons}</div></div>
+        </div>`;
     }).join('');
-    listHtml = `<div class="my-list">${rows}</div>`;
+    listHtml = `<div class="myc-list">${cards}</div>`;
   }
   el.innerHTML = `
     <div class="my-head">
@@ -1228,11 +1237,24 @@ function renderMyView(){
     ${listHtml}`;
   document.getElementById('meSelect').onchange = (e)=>{ state.me = e.target.value; saveMePref(state.me); render(); };
   document.getElementById('icsBtn').onclick = downloadICS;
-  el.querySelectorAll('.my-row').forEach(row=>{
-    row.addEventListener('click', (ev)=>{ if(ev.target.tagName==='SELECT' || ev.target.classList.contains('swap-request-btn')) return; row.classList.toggle('open'); });
+  el.querySelectorAll('.myc-card').forEach(card=>{
+    card.addEventListener('click', (ev)=>{ if(ev.target.closest('.swap-request-btn') || ev.target.closest('.myc-note-dot')) return; card.classList.toggle('open'); });
+  });
+  el.querySelectorAll('.myc-note-dot').forEach(dot=>{
+    dot.addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      const gi = parseInt(dot.dataset.gi,10);
+      const g = grouped[gi];
+      const dateLabel = new Date(g.date+"T00:00:00").toLocaleDateString('en-AU',{weekday:'long', day:'numeric', month:'short'});
+      openModal({ eyebrow:'Note', title:dateLabel, message:g.day.NOTES, confirmLabel:'Close', hideCancel:true });
+    });
   });
   el.querySelectorAll('.swap-request-btn').forEach(btn=>{
-    btn.addEventListener('click', (ev)=>{ ev.stopPropagation(); const idx = parseInt(btn.dataset.idx,10); requestSwap(entries[idx]); });
+    btn.addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      const gi = parseInt(btn.dataset.gi,10), ei = parseInt(btn.dataset.ei,10);
+      requestSwap(grouped[gi].items[ei]);
+    });
   });
 }
 
@@ -1503,11 +1525,9 @@ document.getElementById('saveBtn').addEventListener('click', ()=>{
 /* ---------------- INIT ---------------- */
 (async function init(){
   applyTheme(state.theme);
-  renderLegend();
   render();
   const isFirstRun = await loadPersisted();
   applyTheme(state.theme);
-  renderLegend();
   render();
   if(isFirstRun && STAFF.length){
     const picked = await modalChoicePick('First time here', 'Who are you?', 'Pick your name so your shifts, swaps, and reminders line up correctly. You can change this anytime from the "My schedule" tab.', STAFF);
