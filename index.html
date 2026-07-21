@@ -74,6 +74,15 @@
   nav.tabs button:hover{ background:rgba(255,255,255,0.12); }
   nav.tabs button.active{ background:var(--amber); color:#20180c; border-color:var(--amber); }
   nav.tabs button .count-dot{ display:inline-block; min-width:16px; padding:0 4px; margin-left:6px; border-radius:8px; background:var(--today); color:#fff; font-family:var(--mono); font-size:10px; font-weight:700; line-height:16px; }
+  .tabs-more-wrap{ position:relative; }
+  .tabs-more-btn{ display:inline-flex; align-items:center; gap:3px; }
+  .tabs-more-btn.active-child{ background:rgba(184,134,63,0.22); border-color:rgba(184,134,63,0.5); color:#f1ede2; }
+  .tabs-more-btn .lt-chevron{ width:11px; height:11px; }
+  .tabs-more-menu{ position:absolute; top:calc(100% + 8px); left:0; background:var(--navy); border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:6px; display:none; flex-direction:column; gap:2px; min-width:190px; z-index:60; box-shadow:0 10px 30px rgba(0,0,0,0.35); }
+  .tabs-more-menu.open{ display:flex; }
+  .tabs-more-menu button{ text-align:left; background:transparent; border:none; border-radius:6px; color:#e2e6ee; padding:8px 10px; }
+  .tabs-more-menu button.active{ background:var(--amber); color:#20180c; }
+  .tabs-more-menu button:hover:not(.active){ background:rgba(255,255,255,0.08); }
   .month-select{ display:flex; gap:6px; margin-top:12px; flex-wrap:wrap; }
   .month-select button{ font-family:var(--mono); font-size:12.5px; color:#cfd6e2; background:transparent; border:1px solid rgba(255,255,255,0.18); padding:5px 12px; border-radius:4px; cursor:pointer; }
   .month-select button.active{ background:var(--teal); border-color:var(--teal); color:#fff; font-weight:600; }
@@ -144,7 +153,9 @@
   table.roster tbody tr.today td.datecell{ color:var(--today); font-weight:700; box-shadow:inset 3px 0 0 var(--today), 1px 0 0 var(--line); }
   table.roster tbody tr.today td.datecell::before{ content:"● "; color:var(--today); }
   table.roster tbody tr.hasissue td.datecell::after{ content:''; display:inline-block; width:11px; height:11px; margin-left:5px; vertical-align:-1px; background:var(--danger); -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22none%22 stroke=%22black%22 stroke-width=%221.6%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z%22/><path d=%22M8 6.2v3.4%22/><circle cx=%228%22 cy=%2212%22 r=%22.65%22 fill=%22black%22 stroke=%22none%22/></svg>') center/contain no-repeat; mask:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22none%22 stroke=%22black%22 stroke-width=%221.6%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z%22/><path d=%22M8 6.2v3.4%22/><circle cx=%228%22 cy=%2212%22 r=%22.65%22 fill=%22black%22 stroke=%22none%22/></svg>') center/contain no-repeat; }
-  td.notecell{ text-align:left; font-family:var(--sans); font-size:11.5px; color:var(--ink-soft); font-style:italic; white-space:normal; min-width:150px; max-width:200px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; cursor:help; }
+  td.notecell{ text-align:center; font-family:var(--sans); cursor:pointer; width:32px; min-width:32px; max-width:32px; padding:0; }
+  .note-dot{ font-size:15px; color:var(--line); }
+  .note-dot.has{ color:var(--amber); font-size:11px; }
   .initial{ display:inline-block; padding:1px 5px; border-radius:3px; font-weight:700; }
   .initial.dim{ opacity:.28; }
   .initial.hi{ outline:2px solid var(--today); outline-offset:1px; }
@@ -412,11 +423,16 @@
   <div class="next-shift-banner" id="nextShiftBanner"></div>
   <nav class="tabs">
     <button data-view="my" class="active">My Roster</button>
-    <button data-view="day">Day</button>
     <button data-view="grid">Full Grid</button>
-    <button data-view="staff">By Staff Member</button>
-    <button data-view="coverage">Coverage<span class="count-dot noprint" id="issueDot" style="display:none;">0</span></button>
-    <button data-view="swaps">Swap Log<span class="count-dot noprint" id="pendingDot" style="display:none;">0</span></button>
+    <div class="tabs-more-wrap">
+      <button type="button" class="tabs-more-btn" id="tabsMoreBtn">More<span class="count-dot noprint" id="moreDot" style="display:none;">0</span> <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="icon lt-chevron" aria-hidden="true"><path d="M4 6.2 8 10l4-3.8"/></svg></button>
+      <div class="tabs-more-menu" id="tabsMoreMenu">
+        <button data-view="day">Day</button>
+        <button data-view="staff">By Staff Member</button>
+        <button data-view="coverage">Coverage<span class="count-dot noprint" id="issueDot" style="display:none;">0</span></button>
+        <button data-view="swaps">Swap Log<span class="count-dot noprint" id="pendingDot" style="display:none;">0</span></button>
+      </div>
+    </div>
   </nav>
   <div class="month-select" id="monthSelect"></div>
 </header>
@@ -976,7 +992,8 @@ function renderGridView(){
       return `<td class="${c.cls} shiftcell" data-month="${d.__month}" data-date="${d.date}" data-col="${c.key}">${inner}</td>`;
     }).join('');
     const noteTitle = d.NOTES ? d.NOTES.replace(/"/g,'&quot;') : '';
-    return `<tr class="${isWeekend?'weekend':''} ${isToday?'today':''} ${hasIssue?'hasissue':''}"><td class="datecell">${dateLabel}<span class="dow">${d.dow}</span></td>${tds}<td class="notecell" title="${noteTitle}">${d.NOTES||''}</td></tr>`;
+    const noteInner = d.NOTES ? '<span class="note-dot has">&#9670;</span>' : '<span class="note-dot">&middot;</span>';
+    return `<tr class="${isWeekend?'weekend':''} ${isToday?'today':''} ${hasIssue?'hasissue':''}"><td class="datecell">${dateLabel}<span class="dow">${d.dow}</span></td>${tds}<td class="notecell" data-date="${d.date}" title="${d.NOTES?'Tap to view note':''}">${noteInner}</td></tr>`;
   }).join('');
   el.innerHTML = `<div class="grid-scroll-hint noprint">${icon('scrollx')} Scroll sideways for later shifts &mdash; the date stays put<button type="button" id="colToggleBtn" class="col-toggle-btn">${state.showAllCols?'Show fewer columns':'Show all columns'}</button></div><div class="grid-wrap"><table class="roster ${state.editMode?'editmode':''} ${state.showAllCols?'showall':''}"><thead><tr class="h1"><th class="datecol">Date</th>${h1}<th>Notes</th></tr><tr class="h2"><th></th>${h2}<th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
   const colToggleBtn = document.getElementById('colToggleBtn');
@@ -986,6 +1003,16 @@ function renderGridView(){
       td.onclick = ()=>{ const {month, date, col} = td.dataset; const colDef = COLS.find(c=>c.key===col); editShift(month, date, col, colDef.time); };
     });
   }
+  el.querySelectorAll('td.notecell').forEach(td=>{
+    const dateVal = td.dataset.date;
+    const day = days.find(x=>x.date===dateVal);
+    if(day && day.NOTES){
+      td.onclick = ()=>{
+        const dateLabel = new Date(dateVal+"T00:00:00").toLocaleDateString('en-AU',{weekday:'long', day:'numeric', month:'short'});
+        openModal({ eyebrow:'Note', title:dateLabel, message:day.NOTES, confirmLabel:'Close', hideCancel:true });
+      };
+    }
+  });
 }
 
 /* ---------------- STAFF VIEW ---------------- */
@@ -1292,7 +1319,9 @@ function renderSwapView(){
 /* ---------------- MAIN RENDER ---------------- */
 let __lastRenderedView = null;
 function render(){
-  document.querySelectorAll('nav.tabs button').forEach(b=>{ b.classList.toggle('active', b.dataset.view===state.view); });
+  document.querySelectorAll('nav.tabs button[data-view]').forEach(b=>{ b.classList.toggle('active', b.dataset.view===state.view); });
+  const foldedViews = ['day','staff','coverage','swaps'];
+  document.getElementById('tabsMoreBtn').classList.toggle('active-child', foldedViews.includes(state.view));
   ['my','day','grid','staff','coverage','swaps'].forEach(v=>{ document.getElementById('view-'+v).style.display = state.view===v ? 'block':'none'; });
   if(__lastRenderedView !== state.view){
     const activeEl = document.getElementById('view-'+state.view);
@@ -1302,7 +1331,6 @@ function render(){
   const toggleBtn = document.getElementById('editToggle');
   toggleBtn.classList.toggle('on', state.editMode);
   toggleBtn.textContent = state.editMode ? 'Editing: on' : 'Editing: off';
-  document.getElementById('editHint').style.display = state.editMode ? 'block' : 'none';
   const pendingCount = SWAPS.filter(s=>s.status==='pending').length;
   const pendingDot = document.getElementById('pendingDot');
   pendingDot.style.display = pendingCount ? 'inline-block' : 'none';
@@ -1311,6 +1339,12 @@ function render(){
   const issueDot = document.getElementById('issueDot');
   issueDot.style.display = issueCount ? 'inline-block' : 'none';
   issueDot.textContent = issueCount;
+  const moreCount = pendingCount + issueCount;
+  const moreDot = document.getElementById('moreDot');
+  moreDot.style.display = moreCount ? 'inline-block' : 'none';
+  moreDot.textContent = moreCount;
+  document.getElementById('importbar').style.display = state.view==='grid' ? '' : 'none';
+  document.getElementById('editHint').style.display = (state.editMode && state.view==='grid') ? 'block' : 'none';
   renderNextShiftBanner();
   renderMonthSelect();
   if(state.view==='my') renderMyView();
@@ -1320,7 +1354,17 @@ function render(){
   if(state.view==='coverage') renderCoverageView();
   if(state.view==='swaps') renderSwapView();
 }
-document.querySelectorAll('nav.tabs button').forEach(b=>{ b.onclick = ()=>{ state.view = b.dataset.view; render(); }; });
+document.querySelectorAll('nav.tabs button[data-view]').forEach(b=>{ b.onclick = ()=>{ state.view = b.dataset.view; document.getElementById('tabsMoreMenu').classList.remove('open'); render(); }; });
+const tabsMoreBtn = document.getElementById('tabsMoreBtn');
+const tabsMoreMenu = document.getElementById('tabsMoreMenu');
+tabsMoreBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  tabsMoreMenu.classList.toggle('open');
+});
+document.addEventListener('click', (e)=>{
+  const wrap = document.querySelector('.tabs-more-wrap');
+  if(wrap && !wrap.contains(e.target)){ tabsMoreMenu.classList.remove('open'); }
+});
 document.getElementById('editToggle').addEventListener('click', ()=>{ state.editMode = !state.editMode; render(); });
 
 /* ---------------- SHIFT EDIT (direct, editing on) ---------------- */
