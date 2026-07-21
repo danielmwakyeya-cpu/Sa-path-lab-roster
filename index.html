@@ -128,33 +128,57 @@
 
   .swatch{ width:11px; height:11px; border-radius:2px; display:inline-block; }
 
-  .grid-wrap{ background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow-x:auto; box-shadow:0 1px 3px rgba(20,20,10,0.05); }
+  .grid-wrap{ background:var(--panel); border:1px solid var(--line); border-top:3px solid var(--navy); border-radius:12px; overflow-x:auto; overflow-y:hidden; box-shadow:0 6px 18px rgba(20,20,10,0.09), 0 1px 3px rgba(20,20,10,0.06); }
   .grid-scroll-hint{ display:none; align-items:center; gap:6px; font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); margin-bottom:8px; }
   @media (max-width:1020px){ .grid-scroll-hint{ display:flex; } }
-  .col-toggle-btn{ margin-left:auto; font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--teal); background:transparent; border:1px solid var(--teal); padding:4px 10px; border-radius:12px; cursor:pointer; }
+  .col-toggle-btn{ margin-left:auto; font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--teal); background:transparent; border:1px solid var(--teal); padding:4px 10px; border-radius:12px; cursor:pointer; transition:background .15s; }
   .col-toggle-btn:hover{ background:rgba(47,125,122,0.1); }
   @media (max-width:700px){
     table.roster:not(.showall) .col-admin, table.roster:not(.showall) .col-rdo, table.roster:not(.showall) .col-hol, table.roster:not(.showall) .col-sick{ display:none; }
   }
   table.roster{ border-collapse:collapse; width:100%; min-width:980px; font-size:13px; }
-  table.roster thead tr.h1 th{ background:var(--navy); color:#f0ede4; font-family:var(--mono); font-weight:600; font-size:11px; letter-spacing:.04em; padding:8px 6px; text-align:center; border-right:1px solid rgba(255,255,255,0.08); }
-  table.roster thead tr.h2 th{ background:#2c3e56; color:#c3cede; font-family:var(--mono); font-size:10px; font-weight:500; padding:4px 6px; text-align:center; border-right:1px solid rgba(255,255,255,0.06); }
-  table.roster thead th.datecol{ text-align:left; padding-left:12px; min-width:78px; position:sticky; left:0; z-index:3;}
-  table.roster tbody td{ padding:6px 6px; text-align:center; border-bottom:1px solid var(--line); border-right:1px solid var(--line); font-family:var(--mono); font-size:12.5px; white-space:nowrap; }
-  table.roster tbody td.datecell{ text-align:left; padding-left:12px; font-family:var(--sans); font-weight:600; color:var(--navy); background:var(--panel); position:sticky; left:0; z-index:1; box-shadow:1px 0 0 var(--line); }
-  table.roster tbody td.datecell .dow{ font-family:var(--mono); font-weight:400; color:var(--ink-soft); font-size:11px; margin-left:5px; }
-  table.roster tbody tr:hover td{ background:rgba(184,134,63,0.08); }
+  table.roster thead tr.h1 th{ background:linear-gradient(180deg,#2b3f5a,var(--navy) 75%); color:#f3efe4; font-family:var(--mono); font-weight:700; font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; padding:10px 6px 6px; text-align:center; border-right:1px solid rgba(255,255,255,0.07); }
+  table.roster thead tr.h2 th{ background:#1c2738; font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.05em; padding:5px 6px 7px; text-align:center; border-right:1px solid rgba(255,255,255,0.05); border-bottom:3px solid var(--line); }
+  table.roster thead tr.h2 th.col-on{ color:#eab391; border-bottom-color:var(--clay); }
+  table.roster thead tr.h2 th.col-lab{ color:#8fd6d1; border-bottom-color:var(--teal); }
+  table.roster thead tr.h2 th.col-trs{ color:#c7b6f0; border-bottom-color:#5b4a8a; }
+  table.roster thead tr.h2 th.col-admin{ color:#bcd6a6; border-bottom-color:var(--sage); }
+  table.roster thead tr.h2 th.col-rdo{ color:#b9c0ca; border-bottom-color:#8a8a8a; }
+  table.roster thead tr.h2 th.col-hol{ color:#ecc48c; border-bottom-color:var(--amber); }
+  table.roster thead tr.h2 th.col-sick{ color:#f2ab97; border-bottom-color:var(--today); }
+  table.roster thead th.datecol{ text-align:left; padding-left:14px; min-width:84px; position:sticky; left:0; z-index:3; background:var(--navy-deep); }
+  table.roster tbody td{ padding:7px 6px; text-align:center; border-bottom:1px solid var(--line); border-right:1px solid var(--line); font-family:var(--mono); font-size:12.5px; white-space:nowrap; transition:background .1s; }
+  td.col-on{ background:rgba(175,91,63,0.045); }
+  td.col-lab{ background:rgba(47,125,122,0.045); }
+  td.col-trs{ background:rgba(91,74,138,0.045); }
+  td.col-admin{ background:rgba(111,140,95,0.045); }
+  td.col-rdo{ background:rgba(122,122,122,0.04); }
+  td.col-hol{ background:rgba(184,134,63,0.045); }
+  td.col-sick{ background:rgba(193,68,44,0.05); }
+  html[data-theme="dark"] td.col-on{ background:rgba(175,91,63,0.09); }
+  html[data-theme="dark"] td.col-lab{ background:rgba(47,125,122,0.09); }
+  html[data-theme="dark"] td.col-trs{ background:rgba(91,74,138,0.1); }
+  html[data-theme="dark"] td.col-admin{ background:rgba(111,140,95,0.09); }
+  html[data-theme="dark"] td.col-rdo{ background:rgba(122,122,122,0.08); }
+  html[data-theme="dark"] td.col-hol{ background:rgba(184,134,63,0.09); }
+  html[data-theme="dark"] td.col-sick{ background:rgba(193,68,44,0.1); }
+  table.roster tbody td.datecell{ text-align:left; padding:8px 14px; font-family:var(--sans); font-weight:600; color:var(--navy); background:linear-gradient(135deg,#fffdf8,#faf6ec); position:sticky; left:0; z-index:1; box-shadow:1px 0 0 var(--line); }
+  table.roster tbody td.datecell .daynum{ font-family:var(--display); font-size:14.5px; font-weight:600; }
+  table.roster tbody td.datecell .dow{ font-family:var(--mono); font-weight:600; color:var(--ink-soft); font-size:9.5px; letter-spacing:.06em; margin-left:6px; background:var(--line); padding:2px 5px; border-radius:4px; vertical-align:1px; }
+  html[data-theme="dark"] table.roster tbody td.datecell{ background:linear-gradient(135deg,#1d2531,#171e28); }
+  table.roster tbody tr:hover td{ background:rgba(184,134,63,0.1); }
   table.roster tbody tr.weekend td{ background:rgba(0,0,0,0.045); }
   html[data-theme="dark"] table.roster tbody tr.weekend td{ background:rgba(255,255,255,0.035); }
-  table.roster tbody tr.weekend:hover td{ background:rgba(184,134,63,0.1); }
+  table.roster tbody tr.weekend:hover td{ background:rgba(184,134,63,0.12); }
   table.roster tbody tr.today td{ background:rgba(193,68,44,0.1); }
   table.roster tbody tr.today td.datecell{ color:var(--today); font-weight:700; box-shadow:inset 3px 0 0 var(--today), 1px 0 0 var(--line); }
   table.roster tbody tr.today td.datecell::before{ content:"● "; color:var(--today); }
   table.roster tbody tr.hasissue td.datecell::after{ content:''; display:inline-block; width:11px; height:11px; margin-left:5px; vertical-align:-1px; background:var(--danger); -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22none%22 stroke=%22black%22 stroke-width=%221.6%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z%22/><path d=%22M8 6.2v3.4%22/><circle cx=%228%22 cy=%2212%22 r=%22.65%22 fill=%22black%22 stroke=%22none%22/></svg>') center/contain no-repeat; mask:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22none%22 stroke=%22black%22 stroke-width=%221.6%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z%22/><path d=%22M8 6.2v3.4%22/><circle cx=%228%22 cy=%2212%22 r=%22.65%22 fill=%22black%22 stroke=%22none%22/></svg>') center/contain no-repeat; }
-  td.notecell{ text-align:center; font-family:var(--sans); cursor:pointer; width:32px; min-width:32px; max-width:32px; padding:0; }
-  .note-dot{ font-size:15px; color:var(--line); }
-  .note-dot.has{ color:var(--amber); font-size:11px; }
-  .initial{ display:inline-block; padding:1px 5px; border-radius:3px; font-weight:700; }
+  td.notecell{ text-align:center; font-family:var(--sans); cursor:pointer; width:34px; min-width:34px; max-width:34px; padding:0; }
+  .note-dot{ display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; font-size:13px; color:var(--line); transition:background .15s; }
+  td.notecell:hover .note-dot{ background:rgba(184,134,63,0.14); }
+  .note-dot.has{ color:var(--amber); font-size:10px; background:rgba(184,134,63,0.14); }
+  .initial{ display:inline-block; padding:2px 6px; border-radius:5px; font-weight:700; font-size:11.5px; letter-spacing:.01em; box-shadow:0 1px 1px rgba(20,20,10,0.08); }
   .initial.dim{ opacity:.28; }
   .initial.hi{ outline:2px solid var(--today); outline-offset:1px; }
   .slash{ color:#c8c2b0; }
@@ -568,6 +592,10 @@ let STAFF = [];
 
 function initials(v){ if(!v) return []; return v.split('/').map(s=>s.trim()).filter(Boolean); }
 function baseName(n){ return (n||'').replace(/\(.*?\)/,'').trim(); }
+/* A real roster entry is 1-4 letters (e.g. DM, JMC), optionally with a (10-2) time suffix.
+   Anything longer or containing a space is almost certainly a note typed into the wrong
+   place (e.g. "DM Sick") rather than a person's initials, so it's kept out of the staff list. */
+function looksLikeInitials(tok){ return /^[A-Za-z]{1,4}$/.test(baseName(tok)); }
 const personColorCache = {};
 function personColor(name){
   if(!name) return 'transparent';
@@ -581,7 +609,7 @@ function personColor(name){
 }
 function staffSet(){
   const s = new Set();
-  allDays.forEach(d=>{ COLS.forEach(c=>{ initials(d[c.key]).forEach(x=>{ const base = baseName(x); if(base && base!=='/') s.add(base); }); }); });
+  allDays.forEach(d=>{ COLS.forEach(c=>{ initials(d[c.key]).forEach(x=>{ const base = baseName(x); if(base && base!=='/' && looksLikeInitials(x)) s.add(base); }); }); });
   return [...s].sort();
 }
 function ensureLeaveDefaults(){ STAFF.forEach(s=>{ if(!LEAVE[s]) LEAVE[s] = {allocated:20}; }); }
@@ -1002,7 +1030,7 @@ function renderGridView(){
     }).join('');
     const noteTitle = d.NOTES ? d.NOTES.replace(/"/g,'&quot;') : '';
     const noteInner = d.NOTES ? '<span class="note-dot has">&#9670;</span>' : '<span class="note-dot">&middot;</span>';
-    return `<tr class="${isWeekend?'weekend':''} ${isToday?'today':''} ${hasIssue?'hasissue':''}"><td class="datecell">${dateLabel}<span class="dow">${d.dow}</span></td>${tds}<td class="notecell" data-date="${d.date}" title="${d.NOTES?'Tap to view note':''}">${noteInner}</td></tr>`;
+    return `<tr class="${isWeekend?'weekend':''} ${isToday?'today':''} ${hasIssue?'hasissue':''}"><td class="datecell"><span class="daynum">${dateLabel}</span><span class="dow">${d.dow}</span></td>${tds}<td class="notecell" data-date="${d.date}" title="${d.NOTES?'Tap to view note':''}">${noteInner}</td></tr>`;
   }).join('');
   el.innerHTML = `<div class="grid-scroll-hint noprint">${icon('scrollx')} Scroll sideways for later shifts &mdash; the date stays put<button type="button" id="colToggleBtn" class="col-toggle-btn">${state.showAllCols?'Show fewer columns':'Show all columns'}</button></div><div class="grid-wrap"><table class="roster ${state.editMode?'editmode':''} ${state.showAllCols?'showall':''}"><thead><tr class="h1"><th class="datecol">Date</th>${h1}<th>Notes</th></tr><tr class="h2"><th></th>${h2}<th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
   const colToggleBtn = document.getElementById('colToggleBtn');
@@ -1421,6 +1449,17 @@ async function editShift(month, date, colKey, colLabel){
   if(input===null) return;
   const newValue = input.trim();
   if(newValue === current) return;
+  if(newValue){
+    const badTokens = initials(newValue).filter(t=>!looksLikeInitials(t));
+    if(badTokens.length){
+      const mentionsSick = /sick/i.test(newValue);
+      const suggestion = mentionsSick
+        ? 'It looks like you\'re noting a sick day — use the sick-day quick action from the menu instead, so it\'s tracked properly rather than saved as a shift entry.'
+        : 'Shift slots are meant for initials only (e.g. "DM"), so anything else you type here will show up as a person in staff lists.';
+      const proceed = await openModal({eyebrow:'Check entry', title:`"${newValue}" doesn't look like initials`, message: suggestion+' You can still save this as-is if that\'s really what you meant.', confirmLabel:'Save anyway'});
+      if(!proceed) return;
+    }
+  }
   const conflictMsgs = describeConflicts(monthDays[idx], colKey, newValue);
   if(conflictMsgs.length){
     const proceed = await modalConfirmDialog('Heads up', 'This may create a scheduling conflict', conflictMsgs, 'Save anyway');
