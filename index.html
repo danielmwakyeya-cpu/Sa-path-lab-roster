@@ -32,12 +32,21 @@
     --mono: 'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
     --sans: 'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
     --display: 'Fraunces','IBM Plex Sans',serif;
+    /* Elevation + motion tokens — every "resting" shadow pairs a tight
+       contact shadow with a soft ambient one (navy-tinted, matching this
+       app's cool palette rather than a generic black), and --spring gives
+       presses/hovers a touch of physical overshoot instead of flat ease. */
+    --shadow-resting: 0 1px 2px rgba(21,31,46,0.10), 0 6px 16px -6px rgba(21,31,46,0.18);
+    --shadow-lifted: 0 4px 10px rgba(21,31,46,0.14), 0 16px 32px -10px rgba(21,31,46,0.28);
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   html[data-theme="dark"]{
     --ink:#e8e6dd; --ink-soft:#a9b0bc; --paper:#11151c; --panel:#1a212c; --line:#2a3342;
     --navy:#3a4d6c; --navy-deep:#0b0e13; --teal:#4ba39f; --amber:#d6a35f; --clay:#d3785a;
     --sage:#8fae7c; --today:#e2694c;
     --grid-line:#3f4d6b;
+    --shadow-resting: 0 1px 2px rgba(0,0,0,0.35), 0 6px 16px -6px rgba(0,0,0,0.45);
+    --shadow-lifted: 0 4px 10px rgba(0,0,0,0.4), 0 18px 36px -10px rgba(0,0,0,0.55);
   }
   *{box-sizing:border-box;}
   *:focus-visible{ outline:2.5px solid var(--teal); outline-offset:2px; }
@@ -68,6 +77,8 @@
   @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
   .quick-wrap{ position:relative; }
   .fab-btn{ width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg, var(--amber), var(--clay)); color:#20180c; border:none; font-size:16px; font-weight:700; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; box-shadow:0 3px 8px rgba(184,134,63,0.4); transition:transform .15s ease; }
+  .fab-btn.search-btn{ background:rgba(255,255,255,0.08); color:#dfe4ee; box-shadow:none; border:1px solid rgba(255,255,255,0.18); }
+  .fab-btn.search-btn:hover{ background:rgba(255,255,255,0.16); }
   .fab-btn:active{ transform:scale(0.92); }
   .fab-btn:hover{ filter:brightness(1.08); }
   .fab-btn[aria-expanded="true"]{ transform:rotate(45deg); }
@@ -183,7 +194,8 @@
   .note-dot{ display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; font-size:13px; color:var(--line); transition:background .15s; }
   td.notecell:hover .note-dot{ background:rgba(184,134,63,0.14); }
   .note-dot.has{ color:var(--amber); font-size:10px; background:rgba(184,134,63,0.14); }
-  .initial{ display:inline-block; padding:2px 6px; border-radius:5px; font-weight:700; font-size:11.5px; letter-spacing:.01em; box-shadow:0 1px 1px rgba(20,20,10,0.08); }
+  .initial{ display:inline-block; padding:2px 7px; border-radius:5px; font-weight:700; font-size:11.5px; letter-spacing:.01em; box-shadow:0 1px 1px rgba(20,20,10,0.08); transition:transform .18s var(--spring); }
+  .initial.clickable:hover{ transform:translateY(-1px); }
   .initial.clickable{ cursor:pointer; }
   .initial.clickable:hover{ filter:brightness(0.94); }
   .draggable-initial{ cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
@@ -283,8 +295,27 @@
   .my-head{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
   .my-head h2{ margin:0; font-size:20px; color:var(--navy); }
   .my-head-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .whoami{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); display:flex; align-items:center; gap:6px; }
-  .whoami select{ font-family:var(--mono); font-weight:700; font-size:12.5px; padding:4px 8px; border-radius:5px; border:1px solid var(--line); color:var(--navy); background:var(--panel); }
+  .whoami{
+    font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:.03em;
+    display:inline-flex; align-items:center; gap:8px;
+    color:#2a1608;
+    background:linear-gradient(135deg, var(--amber), var(--clay));
+    padding:6px 6px 6px 14px; border-radius:22px;
+    box-shadow:var(--shadow-resting);
+    transition:box-shadow .22s var(--spring), transform .22s var(--spring);
+  }
+  .whoami:hover{ box-shadow:var(--shadow-lifted); transform:translateY(-1px); }
+  .whoami select{
+    font-family:var(--mono); font-weight:700; font-size:12.5px;
+    padding:4px 10px; border-radius:16px;
+    border:1.5px solid rgba(255,255,255,0.55);
+    color:#2a1608; background:rgba(255,255,255,0.4);
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .whoami select:hover{ background:rgba(255,255,255,0.6); }
+  .whoami select:focus-visible{ border-color:#2a1608; }
+  html[data-theme="dark"] .whoami{ color:#1a0f04; }
+  html[data-theme="dark"] .whoami select{ color:#1a0f04; }
   .tally-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(52px,1fr)); gap:8px; margin-bottom:18px; }
   .tally-card{ background:var(--panel); border:1.5px solid var(--grid-line); border-radius:8px; padding:10px 6px; text-align:center; }
   .tally-card.hours{ border-color:var(--teal); background:rgba(47,125,122,0.06); }
@@ -500,6 +531,131 @@
     .coverage-summary{ grid-template-columns:1fr; }
     .day-nav .swipe-hint{ display:none; }
   }
+
+  /* =========================================================================
+     ELEVATION PASS — depth, motion, and one signature device layered on top
+     of the existing design system. Nothing here changes structure or
+     behavior; it's shadows, easing, and a restrained animated accent. */
+
+  /* ---- signature device: a slow scanner sweep across the accent stripe,
+     the one indulgent motion on the page, evoking the analyzers/scanners
+     this roster is tracking shifts around. Everything else stays still. ---- */
+  .accent-stripe{ position:sticky; overflow:hidden; }
+  .accent-stripe::after{
+    content:'';
+    position:absolute; top:0; left:-35%; width:35%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
+    mix-blend-mode:overlay;
+    animation:scanSweep 8s ease-in-out infinite;
+  }
+  @keyframes scanSweep{
+    0%{ left:-35%; }
+    40%{ left:135%; }
+    100%{ left:135%; }
+  }
+
+  /* ---- header depth: lift it off the graph-paper background properly ---- */
+  header.top{ box-shadow:0 4px 16px rgba(11,14,19,0.28), 0 1px 0 rgba(255,255,255,0.04) inset; }
+
+  /* ---- sync badge: a satisfying confirm pop instead of an instant color
+     swap, and a smoother breathing pulse while saving (this redefinition
+     of @keyframes pulse intentionally supersedes the simpler opacity-only
+     one above — same animation name, richer motion, nothing to rewire) ---- */
+  @keyframes pulse{ 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.4; transform:scale(0.82);} }
+  .sync-badge.saved{ animation:syncSavedPop .42s var(--spring); }
+  @keyframes syncSavedPop{ 0%{transform:scale(1);} 45%{transform:scale(1.28);} 100%{transform:scale(1);} }
+
+  /* ---- cards: resting elevation + a real lift on hover, spring-eased ---- */
+  .myc-card, .cov-card, .issue-list, .summary-table-wrap, .swap-list, .changelog-entry{
+    box-shadow:var(--shadow-resting);
+    transition:box-shadow .3s var(--spring), transform .3s var(--spring), border-color .15s ease;
+  }
+  .myc-card:hover{ box-shadow:var(--shadow-lifted); transform:translateY(-2px); }
+  .myc-card:active{ transform:translateY(0) scale(0.995); }
+  .myc-card.today{ box-shadow:0 4px 14px rgba(193,68,44,0.16), var(--shadow-resting); }
+
+  .grid-wrap{ box-shadow:var(--shadow-resting), 0 6px 18px rgba(20,20,10,0.09); }
+
+  /* ---- buttons & chips: consistent spring press/hover across the app ---- */
+  .fab-btn, .save-btn, .ics-btn, .import-btn, .print-btn, .col-toggle-btn,
+  .staff-status-chip, .staff-add-btn, .swap-request-btn, .cover-request-btn,
+  .swap-actions button, .modal-btn, .modal-choice, nav.tabs button{
+    transition:transform .22s var(--spring), box-shadow .22s var(--spring), background .15s ease, border-color .15s ease, color .15s ease, filter .15s ease;
+  }
+  .fab-btn:hover, .save-btn:hover, .ics-btn:hover, .import-btn:hover, .print-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:var(--shadow-resting);
+  }
+  .fab-btn:active, .save-btn:active, .ics-btn:active, .import-btn:active, .print-btn:active,
+  .col-toggle-btn:active, .staff-status-chip:active, .swap-request-btn:active,
+  .cover-request-btn:active, .swap-actions button:active, .modal-btn:active, .modal-choice:active{
+    transform:scale(0.94);
+  }
+  nav.tabs button:hover{ transform:translateY(-1px); }
+  nav.tabs button.active{ transform:translateY(-1px); }
+  nav.tabs button:active{ transform:scale(0.96); }
+
+  /* ---- edit toggle: a touch of spring on the knob instead of flat linear ---- */
+  .edit-toggle::after{ transition:left .22s var(--spring); }
+  .edit-toggle::before{ transition:background .22s ease; }
+
+  /* ---- shift chips: a hair of depth so they read as tokens, not flat text ---- */
+  .myc-chip{ box-shadow:0 1px 2px rgba(21,31,46,0.08); }
+
+  /* ---- typography: tighten the display face slightly for a sharper,
+     more editorial header rather than default letter-spacing ---- */
+  .brand h1{ letter-spacing:-0.01em; }
+
+  /* ---- search overlay ---- */
+  .search-card{ max-width:480px; }
+  .search-results{ max-height:min(50vh, 380px); overflow-y:auto; margin-top:2px; }
+  .search-result{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:9px 11px; border-radius:8px; cursor:pointer;
+    font-family:var(--sans); font-size:13px; color:var(--ink);
+    transition:background .15s ease;
+  }
+  .search-result:hover{ background:rgba(47,125,122,0.1); }
+  .search-result .sr-main{ display:flex; align-items:center; gap:9px; min-width:0; }
+  .search-result .sr-main span:last-child{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .search-result .sr-tag{ font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); background:var(--line); padding:2px 7px; border-radius:9px; flex-shrink:0; }
+  .search-empty{ color:var(--ink-soft); font-size:13px; text-align:center; padding:22px 10px; }
+  html[data-theme="dark"] .search-result .sr-tag{ background:rgba(255,255,255,0.08); }
+
+  /* ---- month density heatmap ---- */
+  .density-heatmap{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:18px; box-shadow:var(--shadow-resting); }
+  .dh-head{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+  .dh-legend{ display:flex; align-items:center; gap:5px; font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); }
+  .dh-legend .dh-cell{ display:inline-block; border-radius:3px; }
+  .dh-dow-header{ display:flex; gap:4px; margin-left:0; padding-left:2px; }
+  .dh-dow-header span{ width:22px; text-align:center; font-family:var(--mono); font-size:9.5px; color:var(--ink-soft); }
+  .dh-weeks{ display:flex; flex-direction:column; gap:4px; margin-top:4px; }
+  .dh-week{ display:flex; gap:4px; }
+  .dh-cell{
+    width:22px; height:22px; border-radius:4px; position:relative; cursor:pointer;
+    background:#ececec; transition:transform .18s var(--spring), box-shadow .18s var(--spring);
+  }
+  .dh-cell:hover{ transform:scale(1.15); box-shadow:0 2px 6px rgba(20,20,30,0.25); z-index:2; }
+  .dh-cell.empty{ background:transparent; cursor:default; }
+  .dh-cell.empty:hover{ transform:none; box-shadow:none; }
+  .dh-cell.none{ background:#e6e1d3; }
+  .dh-cell.low{ background:rgba(193,68,44,0.55); }
+  .dh-cell.mid{ background:rgba(184,134,63,0.65); }
+  .dh-cell.high{ background:rgba(111,140,95,0.55); }
+  .dh-cell.full{ background:var(--sage); }
+  .dh-cell.today{ box-shadow:0 0 0 2px var(--navy); }
+  html[data-theme="dark"] .dh-cell.none{ background:#252c37; }
+  html[data-theme="dark"] .dh-cell.today{ box-shadow:0 0 0 2px var(--amber); }
+  @media (max-width:640px){
+    .dh-cell{ width:15px; height:15px; }
+    .dh-dow-header span{ width:15px; font-size:8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .accent-stripe::after{ animation:none; display:none; }
+    .sync-badge.saved{ animation:none; }
+    .myc-card, .cov-card, .fab-btn, .save-btn, .ics-btn, .import-btn, nav.tabs button{ transition:none !important; }
+  }
 </style>
 </head>
 <body>
@@ -514,6 +670,9 @@
     </div>
     <div class="headright">
       <span class="sync-badge offline noprint" id="syncBadge" title="Loading…"><span class="sync-dot"></span><span id="syncLabel" class="sr-only">Loading…</span></span>
+      <button class="fab-btn search-btn noprint" id="searchOpenBtn" aria-label="Search roster" title="Search roster">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="icon" style="width:14px;height:14px;" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l4 4"/></svg>
+      </button>
       <div class="quick-wrap noprint">
         <button class="fab-btn" id="quickActionsBtn" aria-haspopup="true" aria-expanded="false" aria-label="Quick actions">+</button>
         <div class="quick-menu" id="quickMenu">
@@ -521,6 +680,7 @@
           <button class="quick-menu-item" id="addNoteBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M4 2.6h6.2L13 5.4V13a.6.6 0 0 1-.6.6H4a.6.6 0 0 1-.6-.6V3.2a.6.6 0 0 1 .6-.6Z"/><path d="M9.8 2.6V5a.6.6 0 0 0 .6.6h2.4"/><path d="M5.5 8.4h5M5.5 10.6h3.4"/></svg>Add a note for today</button>
           <button class="quick-menu-item" id="leaveRangeBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><rect x="2.2" y="3.2" width="11.6" height="10.6" rx="1.2"/><path d="M2.2 6.4h11.6M5.2 1.8v2.4M10.8 1.8v2.4"/></svg>Mark leave (multiple days)</button>
           <button class="quick-menu-item" id="requestBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M3 2.6h10v9.4l-2.6 2.6H3z"/><path d="M5.5 6h5M5.5 8.6h5M5.5 11.2h2.6"/></svg>Request for next roster</button>
+          <button class="quick-menu-item" id="remindersBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 1.6a4.4 4.4 0 0 0-4.4 4.4v2.6L2 11.4h12l-1.6-2.8V6a4.4 4.4 0 0 0-4.4-4.4Z"/><path d="M6.3 13.4a1.8 1.8 0 0 0 3.4 0"/></svg><span id="remindersBtnLabel">Shift reminders: off</span></button>
           <button class="quick-menu-item install" id="installBtn" style="display:none;"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 2v7.4M5.1 6.7 8 9.6l2.9-2.9"/><path d="M2.6 11.4v1.4A1.6 1.6 0 0 0 4.2 14.4h7.6a1.6 1.6 0 0 0 1.6-1.6v-1.4"/></svg>Install app</button>
           <button class="quick-menu-item theme-item" id="themeToggle"></button>
         </div>
@@ -570,6 +730,24 @@
 </main>
 
 <footer class="noprint">Data from June_2026.xlsx / July_2026.xlsx (imported by the lab manager) &middot; ON=on-call &middot; LAB/TRS=lab bench &amp; transport shifts &middot; times shown as scheduled start</footer>
+
+<div class="modal-overlay noprint" id="searchOverlay" aria-hidden="true">
+  <div class="modal-card search-card" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+    <div class="modal-head">
+      <span class="modal-eyebrow">Search</span>
+      <h3 class="modal-title" id="searchTitle">Find a person, date, or note</h3>
+    </div>
+    <div class="modal-body">
+      <div class="modal-input-wrap">
+        <input class="modal-input" id="searchInput" autocomplete="off" placeholder="e.g. AB, 15 Aug, or a word from a note…">
+      </div>
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="modal-actions choices-only">
+      <button class="modal-btn ghost" id="searchClose">Close</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay noprint" id="modalOverlay" aria-hidden="true">
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -680,6 +858,17 @@ function personColor(name){
   personColorCache[name] = color;
   return color;
 }
+/* Border *style* carries the same per-person identity as a second, hue-
+   independent channel — so two people whose hues look identical to a
+   colorblind teammate still read as visibly different chips (solid vs
+   dashed vs dotted vs double border). */
+const PERSON_PATTERNS = ['solid','dashed','dotted','double'];
+function personPattern(name){
+  if(!name) return 'solid';
+  let hash = 0;
+  for(let i=0;i<name.length;i++){ hash = (hash*17 + name.charCodeAt(i)) % PERSON_PATTERNS.length; }
+  return PERSON_PATTERNS[Math.abs(hash) % PERSON_PATTERNS.length];
+}
 function staffSet(){
   const s = new Set();
   allDays.forEach(d=>{ COLS.forEach(c=>{ initials(d[c.key]).forEach(x=>{ const base = baseName(x); if(base && base!=='/' && looksLikeInitials(x)) s.add(base); }); }); });
@@ -731,7 +920,18 @@ let db = null;
 if(firebaseConfigured && window.firebase){
   try{ firebase.initializeApp(FIREBASE_CONFIG); db = firebase.database(); }catch(e){ db = null; }
 }
-const LOCAL_KEYS = { me:'lab-roster-me', theme:'lab-roster-theme' };
+const LOCAL_KEYS = { me:'lab-roster-me', theme:'lab-roster-theme', reminders:'lab-roster-reminders', reminderLead:'lab-roster-reminder-lead' };
+
+/* Shift reminders are a personal, per-device preference — deliberately kept
+   in localStorage only, not written to Firebase, so turning them on on your
+   phone doesn't turn them on for everyone else's device too. */
+let remindersEnabled = false;
+let reminderLeadMin = 15;
+try{
+  remindersEnabled = localStorage.getItem(LOCAL_KEYS.reminders) === '1';
+  const lm = parseInt(localStorage.getItem(LOCAL_KEYS.reminderLead) || '15', 10);
+  if([15,30,60,120].includes(lm)) reminderLeadMin = lm;
+}catch(e){}
 
 function setSyncBadge(status, label){
   const el = document.getElementById('syncBadge');
@@ -1241,7 +1441,8 @@ function renderGridView(){
         const hi = state.staff && base===state.staff;
         const dim = state.staff && !hi;
         const col = personColor(base);
-        return `<span class="initial ${hi?'hi':''} ${dim?'dim':''}" style="border-bottom:2.5px solid ${col}">${n}</span>`;
+        const pat = personPattern(base);
+        return `<span class="initial ${hi?'hi':''} ${dim?'dim':''}" style="color:${col}; border-width:3px; border-style:${pat}; border-color:${col};">${n}</span>`;
       }).join(' ');
       return `<td class="${c.cls} shiftcell" data-month="${d.__month}" data-date="${d.date}" data-col="${c.key}">${inner}</td>`;
     }).join('');
@@ -1336,9 +1537,52 @@ function renderStaffView(){
 }
 
 /* ---------------- COVERAGE VIEW ---------------- */
+/* ---------------- MONTH DENSITY HEATMAP ----------------
+   Reuses dayGaps() — the same function driving the coverage issue list —
+   so "how full is this day" can never disagree with "does this day have
+   gaps". Weeks run left-to-right, days top-to-bottom within each week
+   (Mon–Sun), continuous across the visible range rather than snapped to
+   calendar month boundaries, so an "ALL" view just keeps flowing. */
+function dayFillRatio(d){
+  const req = (d.dow==='SAT' || d.dow==='SUN') ? WEEKEND_REQUIRED : WEEKDAY_REQUIRED;
+  if(!req.length) return 1;
+  return 1 - (dayGaps(d).length / req.length);
+}
+function renderDensityHeatmap(days){
+  if(!days.length) return '';
+  const dowOrder = {MON:0,TUE:1,WED:2,THU:3,FRI:4,SAT:5,SUN:6};
+  const firstPad = dowOrder[days[0].dow] ?? 0;
+  const cells = [];
+  for(let i=0;i<firstPad;i++) cells.push(null);
+  days.forEach(d=>cells.push(d));
+  while(cells.length % 7 !== 0) cells.push(null);
+  const rows = [];
+  for(let i=0;i<cells.length;i+=7) rows.push(cells.slice(i,i+7));
+  const dowLabels = ['M','T','W','T','F','S','S'];
+  const gridHtml = rows.map(week=>`<div class="dh-week">${week.map(d=>{
+      if(!d) return `<div class="dh-cell empty"></div>`;
+      const ratio = dayFillRatio(d);
+      const isToday = d.date===todayStr;
+      const dateLabel = new Date(d.date+"T00:00:00").toLocaleDateString('en-AU',{weekday:'short',day:'2-digit',month:'short'});
+      let level = 'none';
+      if(ratio>=1) level='full'; else if(ratio>=0.75) level='high'; else if(ratio>=0.5) level='mid'; else if(ratio>0) level='low';
+      return `<div class="dh-cell ${level} ${isToday?'today':''}" data-date="${d.date}" title="${dateLabel} — ${Math.round(ratio*100)}% filled">${isToday?'<span class="dh-today-ring"></span>':''}</div>`;
+    }).join('')}</div>`).join('');
+  return `<div class="density-heatmap noprint">
+      <div class="dh-head">
+        <h3 class="section-h" style="margin:0;">Month at a glance</h3>
+        <div class="dh-legend"><span>Emptier</span><span class="dh-cell none" style="width:11px;height:11px;"></span><span class="dh-cell low" style="width:11px;height:11px;"></span><span class="dh-cell mid" style="width:11px;height:11px;"></span><span class="dh-cell high" style="width:11px;height:11px;"></span><span class="dh-cell full" style="width:11px;height:11px;"></span><span>Fully staffed</span></div>
+      </div>
+      <div class="dh-body">
+        <div class="dh-dow-header">${dowLabels.map(l=>`<span>${l}</span>`).join('')}</div>
+        <div class="dh-weeks">${gridHtml}</div>
+      </div>
+    </div>`;
+}
 function renderCoverageView(){
   const el = document.getElementById('view-coverage');
   const days = visibleDays();
+  const heatmapHtml = renderDensityHeatmap(days);
   const issueDays = days.map(d=>({d, gaps:dayGaps(d), conflicts:dayConflicts(d)})).filter(x=>x.gaps.length||x.conflicts.length);
   const gapCount = issueDays.reduce((n,x)=>n+x.gaps.length,0);
   const conflictCount = issueDays.reduce((n,x)=>n+x.conflicts.length,0);
@@ -1371,7 +1615,8 @@ function renderCoverageView(){
     const remaining = info.allocated - holidaysUsed(s);
     return `<tr><td>${s}</td>${tagCols.map(tg=>`<td>${t[tg]}</td>`).join('')}<td>${t.WKND}</td><td class="${remaining<=5?'leave-low':''}">${remaining}</td></tr>`;
   }).join('');
-  el.innerHTML = `${summaryHtml}
+  el.innerHTML = `${heatmapHtml}
+    ${summaryHtml}
     <h3 class="section-h">Coverage issues</h3>
     ${issuesHtml}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -1383,6 +1628,9 @@ function renderCoverageView(){
     </div>`;
   const pb = document.getElementById('printSummaryBtn');
   if(pb) pb.onclick = ()=>window.print();
+  el.querySelectorAll('.dh-cell[data-date]').forEach(cell=>{
+    cell.addEventListener('click', ()=>jumpToDate(cell.dataset.date));
+  });
 }
 
 /* ---------------- SHARED helpers ---------------- */
@@ -1420,7 +1668,101 @@ function renderNextShiftBanner(){
   el.innerHTML = `<span class="nsb-label">Next shift · ${state.me}</span><span class="nsb-main">${isToday?'Today':dateLabel} — ${next.time}</span><span class="nsb-who">${next.raw.includes('(') ? next.raw.match(/\(.*?\)/)[0] : ''}</span>`;
 }
 
+/* ---------------- SHIFT REMINDERS ----------------
+   Reuses the exact same "my next shift" computation as the banner above,
+   rather than a second parallel query, so the two can never disagree. */
+const notifiedShiftKeys = new Set();
+let lastReminderMe = null;
+function updateRemindersLabel(){
+  const lbl = document.getElementById('remindersBtnLabel');
+  if(!lbl) return;
+  lbl.textContent = remindersEnabled ? `Shift reminders: ${reminderLeadMin} min before` : 'Shift reminders: off';
+}
+function checkShiftReminders(){
+  if(state.me !== lastReminderMe){ notifiedShiftKeys.clear(); lastReminderMe = state.me; }
+  if(!remindersEnabled || !state.me) return;
+  if(typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  const future = myEntriesFor(state.me, allDays).filter(e => e.date >= todayStr);
+  if(!future.length) return;
+  const next = future[0];
+  const key = next.date + '|' + next.colKey;
+  if(notifiedShiftKeys.has(key)) return;
+  const tm = TIME_MAP[next.colKey];
+  if(!tm) return;
+  const shiftDate = new Date(next.date+'T00:00:00');
+  shiftDate.setHours(tm[0], tm[1], 0, 0);
+  const diffMin = (shiftDate - new Date()) / 60000;
+  if(diffMin >= 0 && diffMin <= reminderLeadMin){
+    const dateLabel = new Date(next.date+'T00:00:00').toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'short'});
+    try{
+      new Notification('Upcoming shift — ' + next.time, {
+        body: (diffMin<=1 ? 'Starting now' : `In ~${Math.round(diffMin)} min`) + ' · ' + dateLabel
+      });
+    }catch(e){ /* ignore */ }
+    notifiedShiftKeys.add(key);
+  }
+}
+
+/* ---------------- SEARCH ----------------
+   Scans staff initials, formatted date labels, and day notes. Jumping to a
+   date result switches month filter to ALL first so the target date is
+   always inside visibleDays(), regardless of whatever month was showing. */
+function performRosterSearch(query){
+  const q = query.trim().toLowerCase();
+  if(!q) return [];
+  const results = [];
+  STAFF.forEach(s=>{ if(s.toLowerCase().includes(q)) results.push({kind:'staff', staff:s}); });
+  allDays.forEach(d=>{
+    const label = new Date(d.date+'T00:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+    if(label.toLowerCase().includes(q)) results.push({kind:'date', date:d.date, label});
+    if(d.NOTES && d.NOTES.toLowerCase().includes(q)) results.push({kind:'note', date:d.date, label, text:d.NOTES});
+  });
+  return results.slice(0, 40);
+}
+function jumpToDate(dateStr){
+  state.month = 'ALL';
+  const days2 = visibleDays();
+  const idx = days2.findIndex(x=>x.date===dateStr);
+  if(idx>=0) state.dayIndex = idx;
+  state.view = 'day';
+  render();
+}
+function renderSearchResults(query){
+  const box = document.getElementById('searchResults');
+  const results = performRosterSearch(query);
+  if(!query.trim()){ box.innerHTML = `<div class="search-empty">Start typing a name, date, or note keyword…</div>`; return; }
+  if(!results.length){ box.innerHTML = `<div class="search-empty">No matches for "${query}".</div>`; return; }
+  box.innerHTML = results.map((r,i)=>{
+    if(r.kind==='staff') return `<div class="search-result" data-i="${i}"><div class="sr-main"><span style="color:${personColor(r.staff)};font-weight:700;">${r.staff}</span><span>View this person's shifts in the grid</span></div><span class="sr-tag">Staff</span></div>`;
+    if(r.kind==='note') return `<div class="search-result" data-i="${i}"><div class="sr-main"><span>${r.label}</span><span>${r.text}</span></div><span class="sr-tag">Note</span></div>`;
+    return `<div class="search-result" data-i="${i}"><div class="sr-main"><span>${r.label}</span></div><span class="sr-tag">Date</span></div>`;
+  }).join('');
+  box.querySelectorAll('.search-result').forEach(elx=>{
+    elx.addEventListener('click', ()=>{
+      const r = results[parseInt(elx.dataset.i,10)];
+      document.getElementById('searchOverlay').classList.remove('show');
+      if(r.kind==='staff'){ state.staff = r.staff; state.view = 'grid'; render(); }
+      else { jumpToDate(r.date); }
+    });
+  });
+}
+const searchOverlay = document.getElementById('searchOverlay');
+const searchInputEl = document.getElementById('searchInput');
+document.getElementById('searchOpenBtn').addEventListener('click', ()=>{
+  searchInputEl.value = '';
+  renderSearchResults('');
+  searchOverlay.classList.add('show');
+  searchOverlay.setAttribute('aria-hidden','false');
+  setTimeout(()=>searchInputEl.focus(), 30);
+});
+function closeSearchOverlay(){ searchOverlay.classList.remove('show'); searchOverlay.setAttribute('aria-hidden','true'); }
+document.getElementById('searchClose').addEventListener('click', closeSearchOverlay);
+searchOverlay.addEventListener('click', (e)=>{ if(e.target===searchOverlay) closeSearchOverlay(); });
+searchInputEl.addEventListener('input', ()=>renderSearchResults(searchInputEl.value));
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && searchOverlay.classList.contains('show')) closeSearchOverlay(); });
+
 /* ---------------- CALENDAR EXPORT (.ics) ---------------- */
+
 function pad(n){ return String(n).padStart(2,'0'); }
 function icsDate(dateStr, hh, mm){ return dateStr.replace(/-/g,'') + 'T' + pad(hh) + pad(mm) + '00'; }
 function generateICS(entries, who){
@@ -2147,6 +2489,26 @@ document.getElementById('sickBtn').addEventListener('click', markSickToday);
 document.getElementById('addNoteBtn').addEventListener('click', addNoteToday);
 document.getElementById('leaveRangeBtn').addEventListener('click', markLeaveRange);
 document.getElementById('requestBtn').addEventListener('click', submitShiftRequest);
+document.getElementById('remindersBtn').addEventListener('click', async ()=>{
+  if(!remindersEnabled){
+    if(!('Notification' in window)){ showToast('Notifications are not supported in this browser.', 'warn'); return; }
+    const perm = await Notification.requestPermission();
+    if(perm !== 'granted'){ showToast('Notifications were blocked — allow them to use shift reminders.', 'warn'); return; }
+    const picked = await modalChoicePick('Shift reminders', 'Remind me before my shifts', 'Only fires while this page is open in a tab or installed app — not if your phone is locked or the app is fully closed.', ['15 min before','30 min before','60 min before','2 hours before']);
+    if(!picked) return;
+    reminderLeadMin = {'15 min before':15,'30 min before':30,'60 min before':60,'2 hours before':120}[picked] || 15;
+    remindersEnabled = true;
+    try{ localStorage.setItem(LOCAL_KEYS.reminders,'1'); localStorage.setItem(LOCAL_KEYS.reminderLead, String(reminderLeadMin)); }catch(e){}
+    notifiedShiftKeys.clear();
+    updateRemindersLabel();
+    showToast('Shift reminders are on.');
+  } else {
+    remindersEnabled = false;
+    try{ localStorage.setItem(LOCAL_KEYS.reminders,'0'); }catch(e){}
+    updateRemindersLabel();
+    showToast('Shift reminders turned off.');
+  }
+});
 
 /* ---------------- IMPORT (.xlsx from lab manager) ---------------- */
 const COL_ORDER = ['ON','700_LAB','700_TRS','800','900','1000','1100_TRS','1230','1500','2300','ADMIN','RDO','HOLIDAYS','NOTES'];
@@ -2282,6 +2644,8 @@ document.getElementById('saveBtn').addEventListener('click', ()=>{
   const isFirstRun = await loadPersisted();
   applyTheme(state.theme);
   render();
+  updateRemindersLabel();
+  setInterval(checkShiftReminders, 30000);
   if(isFirstRun && STAFF.length){
     const picked = await modalChoicePick('First time here', 'Who are you?', 'Pick your name so your shifts, swaps, and reminders line up correctly. You can change this anytime from the "My schedule" tab.', STAFF);
     if(picked){ state.me = picked; saveMePref(picked); render(); }
