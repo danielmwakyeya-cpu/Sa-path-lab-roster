@@ -194,7 +194,16 @@
   .note-dot{ display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; font-size:13px; color:var(--line); transition:background .15s; }
   td.notecell:hover .note-dot{ background:rgba(184,134,63,0.14); }
   .note-dot.has{ color:var(--amber); font-size:10px; background:rgba(184,134,63,0.14); }
-  .initial{ display:inline-block; padding:2px 7px; border-radius:5px; font-weight:700; font-size:11.5px; letter-spacing:.01em; box-shadow:0 1px 1px rgba(20,20,10,0.08); transition:transform .18s var(--spring); }
+  .initial{ display:inline-block; padding:2px 7px; border-radius:5px; font-weight:700; font-size:11.5px; letter-spacing:.01em; box-shadow:0 1px 1px rgba(20,20,10,0.08); transition:transform .18s var(--spring); position:relative; }
+  .shift-note-dot{
+    position:absolute; top:-5px; right:-5px; width:12px; height:12px;
+    border-radius:50%; background:var(--amber); border:1.5px solid var(--panel);
+    box-shadow:0 1px 2px rgba(20,20,10,0.3);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    font-size:7px; line-height:1; color:#20180c;
+    transition:transform .18s var(--spring);
+  }
+  .shift-note-dot:hover{ transform:scale(1.25); }
   .initial.clickable:hover{ transform:translateY(-1px); }
   .initial.clickable{ cursor:pointer; }
   .initial.clickable:hover{ filter:brightness(0.94); }
@@ -1312,15 +1321,36 @@ function renderDayView(){
 /* ---------------- GRID VIEW ---------------- */
 let dragState = null;
 let justDragged = false;
+let noteJustPrompted = false; // suppresses the td click-to-edit-cell right after a long-press note prompt
 const DRAG_THRESHOLD = 8;
+const LONG_PRESS_MS = 550;
 function startPointerDrag(ev, span, td){
   if(ev.pointerType==='mouse' && ev.button!==0) return;
   span.setPointerCapture(ev.pointerId);
-  dragState = { pointerId: ev.pointerId, sourceTd: td, name: span.textContent.replace(/\(.*?\)/,'').trim(), startX: ev.clientX, startY: ev.clientY, dragging: false, ghostEl: null, lastOverTd: null };
+  dragState = { pointerId: ev.pointerId, sourceTd: td, name: (span.dataset.name || span.textContent).replace(/\(.*?\)/,'').trim(), startX: ev.clientX, startY: ev.clientY, dragging: false, ghostEl: null, lastOverTd: null };
+  const { month, date, col } = td.dataset;
+  const rawName = span.dataset.name || span.textContent;
+  // Long-press on the initial — held still past LONG_PRESS_MS — opens a
+  // per-shift note instead of moving it. The moment real drag movement
+  // starts (onMove below), this timer is cancelled, so the two gestures
+  // sharing the same pointerdown never fight each other.
+  let longPressTimer = setTimeout(()=>{
+    longPressTimer = null;
+    if(!dragState || dragState.dragging) return; // became a real drag instead
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    window.removeEventListener('pointercancel', onUp);
+    dragState = null;
+    if(navigator.vibrate) navigator.vibrate(15);
+    noteJustPrompted = true;
+    setTimeout(()=>{ noteJustPrompted = false; }, 400);
+    promptShiftNote(month, date, col, rawName);
+  }, LONG_PRESS_MS);
   const onMove = (e)=>{
     if(!dragState || e.pointerId!==dragState.pointerId) return;
     const dx = e.clientX-dragState.startX, dy = e.clientY-dragState.startY;
     if(!dragState.dragging && Math.hypot(dx,dy) > DRAG_THRESHOLD){
+      if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer = null; }
       dragState.dragging = true;
       dragState.sourceTd.classList.add('drag-src');
       const ghost = document.createElement('div');
@@ -1340,6 +1370,7 @@ function startPointerDrag(ev, span, td){
   };
   const onUp = (e)=>{
     if(!dragState || e.pointerId!==dragState.pointerId) return;
+    if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer = null; }
     window.removeEventListener('pointermove', onMove);
     window.removeEventListener('pointerup', onUp);
     window.removeEventListener('pointercancel', onUp);
@@ -1363,6 +1394,36 @@ function startPointerDrag(ev, span, td){
   window.addEventListener('pointermove', onMove);
   window.addEventListener('pointerup', onUp);
   window.addEventListener('pointercancel', onUp);
+}
+async function promptShiftNote(month, date, colKey, rawName){
+  const monthDays = ROSTER[month] && ROSTER[month].days;
+  if(!monthDays) return;
+  const idx = monthDays.findIndex(x=>x.date===date);
+  if(idx===-1) return;
+  const base = baseName(rawName);
+  const colDef = COLS.find(c=>c.key===colKey);
+  const noteKey = colKey + '|' + base;
+  const existing = (monthDays[idx].SHIFT_NOTES && monthDays[idx].SHIFT_NOTES[noteKey]) || '';
+  const dateLabel = new Date(date+"T00:00:00").toLocaleDateString('en-AU',{weekday:'long', day:'numeric', month:'short'});
+  const val = await modalPrompt('Shift note', `Note for ${base} — ${colDef?colDef.time:colKey}`, `${dateLabel}. Attached to this specific shift, separate from the day note.`, existing);
+  if(val===null) return;
+  const trimmed = val.trim();
+  if(trimmed === existing) return;
+  if(!monthDays[idx].SHIFT_NOTES) monthDays[idx].SHIFT_NOTES = {};
+  if(trimmed) monthDays[idx].SHIFT_NOTES[noteKey] = trimmed;
+  else delete monthDays[idx].SHIFT_NOTES[noteKey];
+  rebuildDerived();
+  saveRoster();
+  showToast(trimmed ? 'Shift note saved.' : 'Shift note cleared.', null, ()=>{
+    if(!monthDays[idx].SHIFT_NOTES) monthDays[idx].SHIFT_NOTES = {};
+    if(existing) monthDays[idx].SHIFT_NOTES[noteKey] = existing;
+    else delete monthDays[idx].SHIFT_NOTES[noteKey];
+    rebuildDerived();
+    saveRoster();
+    showToast('Change undone.');
+    render();
+  });
+  render();
 }
 function removeNameFromValue(value, name){
   const tokens = initials(value);
@@ -1442,7 +1503,10 @@ function renderGridView(){
         const dim = state.staff && !hi;
         const col = personColor(base);
         const pat = personPattern(base);
-        return `<span class="initial ${hi?'hi':''} ${dim?'dim':''}" style="color:${col}; border-width:3px; border-style:${pat}; border-color:${col};">${n}</span>`;
+        const noteKey = c.key + '|' + base;
+        const hasNote = !!(d.SHIFT_NOTES && d.SHIFT_NOTES[noteKey]);
+        const dotHtml = hasNote ? `<span class="shift-note-dot" data-note-key="${noteKey}" aria-label="View shift note">&#9670;</span>` : '';
+        return `<span class="initial ${hi?'hi':''} ${dim?'dim':''}" data-name="${n.replace(/"/g,'&quot;')}" style="color:${col}; border-width:3px; border-style:${pat}; border-color:${col};">${n}${dotHtml}</span>`;
       }).join(' ');
       return `<td class="${c.cls} shiftcell" data-month="${d.__month}" data-date="${d.date}" data-col="${c.key}">${inner}</td>`;
     }).join('');
@@ -1457,7 +1521,7 @@ function renderGridView(){
   if(colToggleBtn) colToggleBtn.onclick = ()=>{ state.showAllCols = !state.showAllCols; renderGridView(); };
   if(state.editMode){
     el.querySelectorAll('td.shiftcell').forEach(td=>{
-      td.onclick = ()=>{ if(justDragged) return; const {month, date, col} = td.dataset; const colDef = COLS.find(c=>c.key===col); editShift(month, date, col, colDef.time); };
+      td.onclick = ()=>{ if(justDragged || noteJustPrompted) return; const {month, date, col} = td.dataset; const colDef = COLS.find(c=>c.key===col); editShift(month, date, col, colDef.time); };
     });
     el.querySelectorAll('td.shiftcell .initial').forEach(span=>{
       const td = span.closest('td.shiftcell');
@@ -1466,12 +1530,34 @@ function renderGridView(){
     });
   } else {
     el.querySelectorAll('td.shiftcell .initial').forEach(span=>{
-      const base = span.textContent.replace(/\(.*?\)/,'').trim();
+      const base = (span.dataset.name || span.textContent).replace(/\(.*?\)/,'').trim();
       if(!STAFF.includes(base)) return;
       span.classList.add('clickable');
       span.onclick = (ev)=>{ ev.stopPropagation(); state.staff = (state.staff===base) ? null : base; render(); };
     });
   }
+  // Shift-note dot: works the same whether edit mode is on or off, and
+  // intercepts the event before it can bubble to the parent initial's own
+  // drag-start (edit mode) or highlight-toggle (view mode) handler.
+  el.querySelectorAll('.shift-note-dot').forEach(dot=>{
+    const stop = (ev)=>ev.stopPropagation();
+    dot.addEventListener('pointerdown', stop);
+    dot.addEventListener('click', (ev)=>{
+      stop(ev);
+      const span = dot.closest('.initial');
+      const td = dot.closest('td.shiftcell');
+      const { month, date, col } = td.dataset;
+      const monthDays = ROSTER[month] && ROSTER[month].days;
+      const day = monthDays && monthDays.find(x=>x.date===date);
+      const base = (span.dataset.name || '').replace(/\(.*?\)/,'').trim();
+      const noteKey = col + '|' + base;
+      const noteText = day && day.SHIFT_NOTES && day.SHIFT_NOTES[noteKey];
+      if(!noteText) return;
+      const colDef = COLS.find(c=>c.key===col);
+      const dateLabel = new Date(date+"T00:00:00").toLocaleDateString('en-AU',{weekday:'long', day:'numeric', month:'short'});
+      openModal({ eyebrow:'Shift note', title:`${base} — ${colDef?colDef.time:col}`, message:`${dateLabel}\n\n${noteText}`, confirmLabel:'Close', hideCancel:true });
+    });
+  });
   el.querySelectorAll('td.notecell').forEach(td=>{
     const dateVal = td.dataset.date;
     const day = days.find(x=>x.date===dateVal);
