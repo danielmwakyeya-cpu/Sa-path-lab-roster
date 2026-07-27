@@ -136,7 +136,7 @@
 
   .swatch{ width:11px; height:11px; border-radius:2px; display:inline-block; }
 
-  .grid-wrap{ background:var(--panel); border:1px solid var(--line); border-top:3px solid var(--navy); border-radius:12px; overflow-x:auto; overflow-y:hidden; box-shadow:0 6px 18px rgba(20,20,10,0.09), 0 1px 3px rgba(20,20,10,0.06); }
+  .grid-wrap{ background:var(--panel); border:1px solid var(--line); border-top:3px solid var(--navy); border-radius:12px; overflow:auto; max-height:62vh; box-shadow:0 6px 18px rgba(20,20,10,0.09), 0 1px 3px rgba(20,20,10,0.06); }
   .grid-scroll-hint{ display:none; align-items:center; gap:6px; font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); margin-bottom:8px; }
   @media (max-width:1020px){ .grid-scroll-hint{ display:flex; } }
   .col-toggle-btn{ margin-left:auto; font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--teal); background:transparent; border:1px solid var(--teal); padding:4px 10px; border-radius:12px; cursor:pointer; transition:background .15s; }
@@ -145,8 +145,8 @@
     table.roster:not(.showall) .col-admin, table.roster:not(.showall) .col-rdo, table.roster:not(.showall) .col-hol, table.roster:not(.showall) .col-sick{ display:none; }
   }
   table.roster{ border-collapse:collapse; width:100%; min-width:980px; font-size:13px; }
-  table.roster thead tr.h1 th{ background:linear-gradient(180deg,#2b3f5a,var(--navy) 75%); color:#f3efe4; font-family:var(--mono); font-weight:700; font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; padding:10px 6px 6px; text-align:center; border-right:1px solid rgba(255,255,255,0.16); }
-  table.roster thead tr.h2 th{ background:#1c2738; font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.05em; padding:5px 6px 7px; text-align:center; border-right:1px solid rgba(255,255,255,0.12); border-bottom:3px solid var(--line); }
+  table.roster thead tr.h1 th{ background:linear-gradient(180deg,#2b3f5a,var(--navy) 75%); color:#f3efe4; font-family:var(--mono); font-weight:700; font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; padding:10px 6px 6px; text-align:center; border-right:1px solid rgba(255,255,255,0.16); position:sticky; top:0; z-index:4; height:30px; box-sizing:border-box; }
+  table.roster thead tr.h2 th{ background:#1c2738; font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.05em; padding:5px 6px 7px; text-align:center; border-right:1px solid rgba(255,255,255,0.12); border-bottom:3px solid var(--line); position:sticky; top:30px; z-index:4; height:28px; box-sizing:border-box; }
   table.roster thead tr.h2 th.col-on{ color:#eab391; border-bottom-color:var(--clay); }
   table.roster thead tr.h2 th.col-lab{ color:#8fd6d1; border-bottom-color:var(--teal); }
   table.roster thead tr.h2 th.col-trs{ color:#c7b6f0; border-bottom-color:#5b4a8a; }
@@ -154,7 +154,8 @@
   table.roster thead tr.h2 th.col-rdo{ color:#b9c0ca; border-bottom-color:#8a8a8a; }
   table.roster thead tr.h2 th.col-hol{ color:#ecc48c; border-bottom-color:var(--amber); }
   table.roster thead tr.h2 th.col-sick{ color:#f2ab97; border-bottom-color:var(--today); }
-  table.roster thead th.datecol{ text-align:left; padding-left:14px; min-width:84px; position:sticky; left:0; z-index:3; background:var(--navy-deep); }
+  table.roster thead th.datecol{ text-align:left; padding-left:14px; min-width:84px; position:sticky; left:0; top:0; z-index:6; background:var(--navy-deep); }
+  table.roster thead tr.h2 th:first-child{ position:sticky; left:0; top:30px; z-index:6; background:#1c2738; }
   table.roster tbody td{ padding:7px 6px; text-align:center; border-bottom:1.5px solid var(--grid-line); border-right:1.5px solid var(--grid-line); font-family:var(--mono); font-size:12.5px; white-space:nowrap; transition:background .1s; }
   td.col-on{ background:rgba(175,91,63,0.045); }
   td.col-lab{ background:rgba(47,125,122,0.045); }
@@ -1271,7 +1272,7 @@ function renderGridView(){
     const phBadge = ph ? `<span class="ph-badge" title="${ph}">PH</span>` : '';
     return `<tr class="${isWeekend?'weekend':''} ${isToday?'today':''} ${hasIssue?'hasissue':''} ${ph?'pubhol':''}"><td class="datecell"><span class="daynum">${dateLabel}</span><span class="dow">${d.dow}</span>${phBadge}</td>${tds}<td class="notecell" data-date="${d.date}" title="${d.NOTES?'Tap to view note':''}">${noteInner}</td></tr>`;
   }).join('');
-  el.innerHTML = `<div class="grid-scroll-hint noprint">${icon('scrollx')} Scroll sideways for later shifts &mdash; the date stays put<button type="button" id="colToggleBtn" class="col-toggle-btn">${state.showAllCols?'Show fewer columns':'Show all columns'}</button></div><div class="grid-wrap"><table class="roster ${state.editMode?'editmode':''} ${state.showAllCols?'showall':''}"><thead><tr class="h1"><th class="datecol">Date</th>${h1}<th>Notes</th></tr><tr class="h2"><th></th>${h2}<th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  el.innerHTML = `<div class="grid-scroll-hint noprint">${icon('scrollx')} Scroll — the date column and shift-time headers stay put<button type="button" id="colToggleBtn" class="col-toggle-btn">${state.showAllCols?'Show fewer columns':'Show all columns'}</button></div><div class="grid-wrap"><table class="roster ${state.editMode?'editmode':''} ${state.showAllCols?'showall':''}"><thead><tr class="h1"><th class="datecol">Date</th>${h1}<th>Notes</th></tr><tr class="h2"><th></th>${h2}<th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
   const colToggleBtn = document.getElementById('colToggleBtn');
   if(colToggleBtn) colToggleBtn.onclick = ()=>{ state.showAllCols = !state.showAllCols; renderGridView(); };
   if(state.editMode){
