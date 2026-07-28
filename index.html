@@ -77,6 +77,8 @@
   .fab-btn:hover{ filter:brightness(1.08); }
   .fab-btn[aria-expanded="true"]{ transform:rotate(45deg); }
   .quick-menu{ position:fixed; background-color:#1c2738; opacity:1; border:1px solid rgba(255,255,255,0.22); border-radius:10px; padding:6px; display:none; flex-direction:column; gap:2px; min-width:190px; z-index:9999; box-shadow:0 12px 34px rgba(0,0,0,0.55); }
+  .menu-backdrop{ position:fixed; inset:0; background:rgba(8,10,15,0.6); z-index:9998; display:none; }
+  .menu-backdrop.open{ display:block; }
   .quick-menu.open{ display:flex; }
   .quick-menu-item{ all:unset; box-sizing:border-box; cursor:pointer; display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; font-family:var(--sans); font-size:12.5px; font-weight:600; color:#e2e6ee; white-space:nowrap; }
   .quick-menu-item:hover{ background:rgba(255,255,255,0.08); }
@@ -558,6 +560,7 @@
       <span class="sync-badge offline noprint" id="syncBadge" title="Loading…"><span class="sync-dot"></span><span id="syncLabel" class="sr-only">Loading…</span></span>
       <div class="quick-wrap noprint">
         <button class="fab-btn" id="quickActionsBtn" aria-haspopup="true" aria-expanded="false" aria-label="Quick actions">+</button>
+        <div class="menu-backdrop" id="quickMenuBackdrop"></div>
         <div class="quick-menu" id="quickMenu">
           <button class="quick-menu-item sick" id="sickBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 1.6 14.6 13.4a1 1 0 0 1-.87 1.5H2.27a1 1 0 0 1-.87-1.5L8 1.6Z"/><path d="M8 6.2v3.4"/><circle cx="8" cy="12" r=".65" fill="currentColor" stroke="none"/></svg>Mark sick today</button>
           <button class="quick-menu-item" id="addNoteBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M4 2.6h6.2L13 5.4V13a.6.6 0 0 1-.6.6H4a.6.6 0 0 1-.6-.6V3.2a.6.6 0 0 1 .6-.6Z"/><path d="M9.8 2.6V5a.6.6 0 0 0 .6.6h2.4"/><path d="M5.5 8.4h5M5.5 10.6h3.4"/></svg>Add a note for today</button>
@@ -576,6 +579,7 @@
     <button data-view="grid">Full Grid</button>
     <div class="tabs-more-wrap">
       <button type="button" class="tabs-more-btn" id="tabsMoreBtn">More<span class="count-dot noprint" id="moreDot" style="display:none;">0</span> <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="icon lt-chevron" aria-hidden="true"><path d="M4 6.2 8 10l4-3.8"/></svg></button>
+      <div class="menu-backdrop" id="tabsMoreBackdrop"></div>
       <div class="tabs-more-menu" id="tabsMoreMenu">
         <button data-view="day">Day</button>
         <button data-view="staff">By Staff Member</button>
@@ -1084,9 +1088,11 @@ function holidaysUsed(staff){ return allDays.reduce((n,d)=> n + initials(d.HOLID
 
 const quickActionsBtn = document.getElementById('quickActionsBtn');
 const quickMenu = document.getElementById('quickMenu');
+const quickMenuBackdrop = document.getElementById('quickMenuBackdrop');
 quickActionsBtn.addEventListener('click', (e)=>{
   e.stopPropagation();
   const isOpen = quickMenu.classList.toggle('open');
+  quickMenuBackdrop.classList.toggle('open', isOpen);
   quickActionsBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   if(isOpen){
     const rect = quickActionsBtn.getBoundingClientRect();
@@ -1095,13 +1101,19 @@ quickActionsBtn.addEventListener('click', (e)=>{
     quickMenu.style.left = 'auto';
   }
 });
+quickMenuBackdrop.addEventListener('click', ()=>{
+  quickMenu.classList.remove('open');
+  quickMenuBackdrop.classList.remove('open');
+  quickActionsBtn.setAttribute('aria-expanded','false');
+});
 quickMenu.addEventListener('click', ()=>{
-  setTimeout(()=>{ quickMenu.classList.remove('open'); quickActionsBtn.setAttribute('aria-expanded','false'); }, 60);
+  setTimeout(()=>{ quickMenu.classList.remove('open'); quickMenuBackdrop.classList.remove('open'); quickActionsBtn.setAttribute('aria-expanded','false'); }, 60);
 });
 document.addEventListener('click', (e)=>{
   const wrap = document.querySelector('.quick-wrap');
   if(wrap && !wrap.contains(e.target)){
     quickMenu.classList.remove('open');
+    quickMenuBackdrop.classList.remove('open');
     quickActionsBtn.setAttribute('aria-expanded','false');
   }
 });
@@ -2018,12 +2030,14 @@ function render(){
   if(state.view==='swaps') renderSwapView();
   if(state.view==='builder') renderBuilderView();
 }
-document.querySelectorAll('nav.tabs button[data-view]').forEach(b=>{ b.onclick = ()=>{ state.view = b.dataset.view; document.getElementById('tabsMoreMenu').classList.remove('open'); render(); }; });
+document.querySelectorAll('nav.tabs button[data-view]').forEach(b=>{ b.onclick = ()=>{ state.view = b.dataset.view; document.getElementById('tabsMoreMenu').classList.remove('open'); document.getElementById('tabsMoreBackdrop').classList.remove('open'); render(); }; });
 const tabsMoreBtn = document.getElementById('tabsMoreBtn');
 const tabsMoreMenu = document.getElementById('tabsMoreMenu');
+const tabsMoreBackdrop = document.getElementById('tabsMoreBackdrop');
 tabsMoreBtn.addEventListener('click', (e)=>{
   e.stopPropagation();
   const isOpen = tabsMoreMenu.classList.toggle('open');
+  tabsMoreBackdrop.classList.toggle('open', isOpen);
   if(isOpen){
     const rect = tabsMoreBtn.getBoundingClientRect();
     tabsMoreMenu.style.top = (rect.bottom+8)+'px';
@@ -2031,9 +2045,13 @@ tabsMoreBtn.addEventListener('click', (e)=>{
     tabsMoreMenu.style.right = 'auto';
   }
 });
+tabsMoreBackdrop.addEventListener('click', ()=>{
+  tabsMoreMenu.classList.remove('open');
+  tabsMoreBackdrop.classList.remove('open');
+});
 document.addEventListener('click', (e)=>{
   const wrap = document.querySelector('.tabs-more-wrap');
-  if(wrap && !wrap.contains(e.target)){ tabsMoreMenu.classList.remove('open'); }
+  if(wrap && !wrap.contains(e.target)){ tabsMoreMenu.classList.remove('open'); tabsMoreBackdrop.classList.remove('open'); }
 });
 document.getElementById('editToggle').addEventListener('click', ()=>{ state.editMode = !state.editMode; render(); });
 
