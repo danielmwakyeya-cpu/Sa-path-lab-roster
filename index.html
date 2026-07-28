@@ -76,7 +76,7 @@
   .fab-btn:active{ transform:scale(0.92); }
   .fab-btn:hover{ filter:brightness(1.08); }
   .fab-btn[aria-expanded="true"]{ transform:rotate(45deg); }
-  .quick-menu{ position:absolute; top:calc(100% + 8px); right:0; background-color:#1c2738; opacity:1; border:1px solid rgba(255,255,255,0.22); border-radius:10px; padding:6px; display:none; flex-direction:column; gap:2px; min-width:190px; z-index:9999; box-shadow:0 12px 34px rgba(0,0,0,0.55); }
+  .quick-menu{ position:fixed; background-color:#1c2738; opacity:1; border:1px solid rgba(255,255,255,0.22); border-radius:10px; padding:6px; display:none; flex-direction:column; gap:2px; min-width:190px; z-index:9999; box-shadow:0 12px 34px rgba(0,0,0,0.55); }
   .quick-menu.open{ display:flex; }
   .quick-menu-item{ all:unset; box-sizing:border-box; cursor:pointer; display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; font-family:var(--sans); font-size:12.5px; font-weight:600; color:#e2e6ee; white-space:nowrap; }
   .quick-menu-item:hover{ background:rgba(255,255,255,0.08); }
@@ -91,7 +91,7 @@
   .tabs-more-btn{ display:inline-flex; align-items:center; gap:3px; }
   .tabs-more-btn.active-child{ background:rgba(184,134,63,0.22); border-color:rgba(184,134,63,0.5); color:#f1ede2; }
   .tabs-more-btn .lt-chevron{ width:11px; height:11px; }
-  .tabs-more-menu{ position:absolute; top:calc(100% + 8px); left:0; background-color:#1c2738; opacity:1; border:1px solid rgba(255,255,255,0.22); border-radius:10px; padding:6px; display:none; flex-direction:column; gap:2px; min-width:190px; z-index:9999; box-shadow:0 12px 34px rgba(0,0,0,0.55); }
+  .tabs-more-menu{ position:fixed; background-color:#1c2738; opacity:1; border:1px solid rgba(255,255,255,0.22); border-radius:10px; padding:6px; display:none; flex-direction:column; gap:2px; min-width:190px; z-index:9999; box-shadow:0 12px 34px rgba(0,0,0,0.55); }
   .tabs-more-menu.open{ display:flex; }
   .tabs-more-menu button{ text-align:left; background:transparent; border:none; border-radius:6px; color:#e2e6ee; padding:8px 10px; }
   .tabs-more-menu button.active{ background:var(--amber); color:#20180c; }
@@ -563,7 +563,7 @@
           <button class="quick-menu-item" id="addNoteBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M4 2.6h6.2L13 5.4V13a.6.6 0 0 1-.6.6H4a.6.6 0 0 1-.6-.6V3.2a.6.6 0 0 1 .6-.6Z"/><path d="M9.8 2.6V5a.6.6 0 0 0 .6.6h2.4"/><path d="M5.5 8.4h5M5.5 10.6h3.4"/></svg>Add a note for today</button>
           <button class="quick-menu-item" id="leaveRangeBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><rect x="2.2" y="3.2" width="11.6" height="10.6" rx="1.2"/><path d="M2.2 6.4h11.6M5.2 1.8v2.4M10.8 1.8v2.4"/></svg>Mark leave (multiple days)</button>
           <button class="quick-menu-item" id="requestBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M3 2.6h10v9.4l-2.6 2.6H3z"/><path d="M5.5 6h5M5.5 8.6h5M5.5 11.2h2.6"/></svg>Request for next roster</button>
-          <button class="quick-menu-item install" id="installBtn" style="display:none;"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 2v7.4M5.1 6.7 8 9.6l2.9-2.9"/><path d="M2.6 11.4v1.4A1.6 1.6 0 0 0 4.2 14.4h7.6a1.6 1.6 0 0 0 1.6-1.6v-1.4"/></svg>Install app</button>
+          <button class="quick-menu-item install" id="installBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-hidden="true"><path d="M8 2v7.4M5.1 6.7 8 9.6l2.9-2.9"/><path d="M2.6 11.4v1.4A1.6 1.6 0 0 0 4.2 14.4h7.6a1.6 1.6 0 0 0 1.6-1.6v-1.4"/></svg>Add to Home Screen</button>
           <button class="quick-menu-item theme-item" id="themeToggle"></button>
         </div>
       </div>
@@ -990,6 +990,7 @@ const INSTALL_PROMPTED_KEY = 'lab-roster-install-prompted';
 const installBtn = document.getElementById('installBtn');
 let deferredInstallPrompt = null;
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isAndroid = /android/i.test(navigator.userAgent);
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
 if('serviceWorker' in navigator){
@@ -998,40 +999,53 @@ if('serviceWorker' in navigator){
 
 function iosInstallInstructions(){
   return openModal({
-    eyebrow:'Install app',
+    eyebrow:'Add to Home Screen',
     title:'Add to your Home Screen',
     message:'Tap the Share icon in Safari\'s toolbar, then scroll down and tap "Add to Home Screen". The roster will then open like a normal app, full-screen, with live sync still working.',
     confirmLabel:'Got it',
     hideCancel:true,
   });
 }
+function genericInstallInstructions(){
+  const msg = isAndroid
+    ? 'Open your browser\'s menu (usually ⋮ in the top right) and look for "Add to Home Screen" or "Install app". On Chrome, you can also tap the install icon in the address bar if one is showing.'
+    : 'Look for an install icon in your browser\'s address bar, or open the browser\'s menu and look for "Install [this app]" or "Add to Home Screen" — the exact wording varies by browser.';
+  return openModal({
+    eyebrow:'Add to Home Screen',
+    title:'Add this app to your device',
+    message:msg,
+    confirmLabel:'Got it',
+    hideCancel:true,
+  });
+}
 
-if(!isStandalone){
-  if(isIOS){
-    installBtn.style.display = '';
-    installBtn.addEventListener('click', iosInstallInstructions);
+if(isStandalone){
+  installBtn.style.display = 'none';
+} else if(isIOS){
+  installBtn.addEventListener('click', iosInstallInstructions);
+  if(!localStorage.getItem(INSTALL_PROMPTED_KEY)){
+    localStorage.setItem(INSTALL_PROMPTED_KEY, '1');
+    setTimeout(iosInstallInstructions, 1200);
+  }
+} else {
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault();
+    deferredInstallPrompt = e;
     if(!localStorage.getItem(INSTALL_PROMPTED_KEY)){
       localStorage.setItem(INSTALL_PROMPTED_KEY, '1');
-      setTimeout(iosInstallInstructions, 1200);
+      setTimeout(()=>{ showToast('Tip: tap "Add to Home Screen" in the + menu anytime.'); }, 1200);
     }
-  } else {
-    window.addEventListener('beforeinstallprompt', (e)=>{
-      e.preventDefault();
-      deferredInstallPrompt = e;
-      installBtn.style.display = '';
-      if(!localStorage.getItem(INSTALL_PROMPTED_KEY)){
-        localStorage.setItem(INSTALL_PROMPTED_KEY, '1');
-        setTimeout(()=>{ showToast('Tip: tap "Install app" up top to add this to your home screen.'); }, 1200);
-      }
-    });
-    installBtn.addEventListener('click', async ()=>{
-      if(!deferredInstallPrompt) return;
+  });
+  installBtn.addEventListener('click', async ()=>{
+    if(deferredInstallPrompt){
       deferredInstallPrompt.prompt();
       const choice = await deferredInstallPrompt.userChoice;
-      if(choice.outcome === 'accepted'){ installBtn.style.display = 'none'; }
+      if(choice.outcome === 'accepted'){ showToast('Installed — find it on your home screen.'); }
       deferredInstallPrompt = null;
-    });
-  }
+    } else {
+      genericInstallInstructions();
+    }
+  });
 }
 window.addEventListener('appinstalled', ()=>{ installBtn.style.display = 'none'; showToast('Installed — find it on your home screen.'); });
 
@@ -1074,6 +1088,12 @@ quickActionsBtn.addEventListener('click', (e)=>{
   e.stopPropagation();
   const isOpen = quickMenu.classList.toggle('open');
   quickActionsBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  if(isOpen){
+    const rect = quickActionsBtn.getBoundingClientRect();
+    quickMenu.style.top = (rect.bottom+8)+'px';
+    quickMenu.style.right = (window.innerWidth-rect.right)+'px';
+    quickMenu.style.left = 'auto';
+  }
 });
 quickMenu.addEventListener('click', ()=>{
   setTimeout(()=>{ quickMenu.classList.remove('open'); quickActionsBtn.setAttribute('aria-expanded','false'); }, 60);
@@ -2003,7 +2023,13 @@ const tabsMoreBtn = document.getElementById('tabsMoreBtn');
 const tabsMoreMenu = document.getElementById('tabsMoreMenu');
 tabsMoreBtn.addEventListener('click', (e)=>{
   e.stopPropagation();
-  tabsMoreMenu.classList.toggle('open');
+  const isOpen = tabsMoreMenu.classList.toggle('open');
+  if(isOpen){
+    const rect = tabsMoreBtn.getBoundingClientRect();
+    tabsMoreMenu.style.top = (rect.bottom+8)+'px';
+    tabsMoreMenu.style.left = rect.left+'px';
+    tabsMoreMenu.style.right = 'auto';
+  }
 });
 document.addEventListener('click', (e)=>{
   const wrap = document.querySelector('.tabs-more-wrap');
