@@ -190,15 +190,16 @@
   .note-dot{ display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; font-size:13px; color:var(--line); transition:background .15s; }
   td.notecell:hover .note-dot{ background:rgba(184,134,63,0.14); }
   .note-dot.has{ color:var(--amber); font-size:10px; background:rgba(184,134,63,0.14); }
-  .initial{ display:inline-block; padding:2px 6px; border-radius:5px; font-weight:700; font-size:11.5px; letter-spacing:.01em; box-shadow:0 1px 1px rgba(20,20,10,0.08); }
+  .initial{ display:inline-block; padding:2px 6px; border-radius:5px; font-weight:700; font-size:11.5px; letter-spacing:.01em; box-shadow:0 1px 1px rgba(20,20,10,0.08); transition:transform .15s ease, box-shadow .15s ease; }
   .initial.clickable{ cursor:pointer; }
   .initial.clickable:hover{ filter:brightness(0.94); }
   .draggable-initial{ cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
   td.shiftcell.drag-src{ opacity:.4; }
   td.shiftcell.drag-over{ background:rgba(47,125,122,0.18) !important; outline:2px dashed var(--teal); outline-offset:-2px; }
   .drag-ghost{ position:fixed; z-index:200; top:0; left:0; pointer-events:none; font-family:var(--mono); font-size:13px; font-weight:700; padding:4px 10px; border-radius:6px; background:var(--navy-deep); color:#f6f2e8; box-shadow:0 6px 18px rgba(0,0,0,0.35); }
-  .initial.dim{ opacity:.28; }
-  .initial.hi{ outline:2px solid var(--today); outline-offset:1px; }
+  .initial.dim{ opacity:.18; filter:saturate(.4); }
+  .initial.hi{ outline:3px solid var(--today); outline-offset:1.5px; box-shadow:0 0 0 2px #fff, 0 4px 10px rgba(193,68,44,0.55); transform:scale(1.55); font-size:13px; position:relative; z-index:5; }
+  html[data-theme="dark"] .initial.hi{ box-shadow:0 0 0 2px #151f2e, 0 4px 12px rgba(193,68,44,0.7); }
   .slash{ color:#c8c2b0; }
   td.col-on .initial{ background:#f4e3d3; color:var(--clay); }
   td.col-lab .initial{ background:#dfeceb; color:var(--teal); }
@@ -281,30 +282,32 @@
 
   footer{ text-align:center; font-family:var(--mono); font-size:11px; color:#a39d8b; padding:30px 0 10px; }
 
-  .next-shift-banner{ margin-top:12px; position:relative; z-index:1; background:linear-gradient(90deg, rgba(47,125,122,0.22), rgba(47,125,122,0.07)); border:1px solid rgba(47,125,122,0.4); border-left:3px solid var(--teal); border-radius:9px; padding:10px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px; color:#dff2f0; }
+  .next-shift-banner{ margin-top:12px; position:relative; z-index:1; background:linear-gradient(90deg, rgba(47,125,122,0.38), rgba(47,125,122,0.1)); border:1.5px solid rgba(47,125,122,0.6); border-left:5px solid var(--teal); border-radius:9px; padding:10px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px; color:#dff2f0; box-shadow:0 3px 14px rgba(47,125,122,0.35); }
   .next-shift-banner .nsb-label{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#8fd3cf; }
-  .next-shift-banner .nsb-main{ font-weight:700; color:#fff; }
-  .next-shift-banner .nsb-who{ margin-left:auto; font-family:var(--mono); font-size:11px; font-weight:600; color:#dff2f0; background:rgba(255,255,255,0.08); padding:2px 9px; border-radius:10px; }
-  .next-shift-banner.empty{ background:rgba(255,255,255,0.06); border-left-color:rgba(255,255,255,0.16); border-color:rgba(255,255,255,0.14); color:#a9b3c4; }
-  .next-shift-banner.nsb-ON{ background:linear-gradient(90deg, rgba(175,91,63,0.24), rgba(175,91,63,0.07)); border-color:rgba(175,91,63,0.45); border-left-color:var(--clay); }
+  .next-shift-banner .nsb-main{ font-weight:800; color:#fff; font-size:14px; }
+  .next-shift-banner .nsb-name{ font-family:var(--display); font-style:italic; font-weight:700; font-size:26px; color:#fff; line-height:1; text-shadow:0 2px 6px rgba(0,0,0,0.35); }
+  .next-shift-banner .nsb-body{ display:flex; flex-direction:column; gap:1px; }
+  .next-shift-banner .nsb-who{ margin-left:auto; font-family:var(--mono); font-size:11px; font-weight:700; color:#1a1512; background:#f0ede4; padding:3px 10px; border-radius:10px; }
+  .next-shift-banner.empty{ background:rgba(255,255,255,0.06); border-left-color:rgba(255,255,255,0.16); border-color:rgba(255,255,255,0.14); color:#a9b3c4; box-shadow:none; }
+  .next-shift-banner.nsb-ON{ background:linear-gradient(90deg, rgba(175,91,63,0.4), rgba(175,91,63,0.1)); border-color:rgba(175,91,63,0.65); border-left-color:var(--clay); box-shadow:0 3px 14px rgba(175,91,63,0.4); }
   .next-shift-banner.nsb-ON .nsb-label{ color:#f0b79c; }
-  .next-shift-banner.nsb-LAB{ background:linear-gradient(90deg, rgba(30,136,168,0.26), rgba(30,136,168,0.08)); border-color:rgba(30,136,168,0.48); border-left-color:#1e88a8; }
+  .next-shift-banner.nsb-LAB{ background:linear-gradient(90deg, rgba(30,136,168,0.4), rgba(30,136,168,0.1)); border-color:rgba(30,136,168,0.65); border-left-color:#1e88a8; box-shadow:0 3px 14px rgba(30,136,168,0.4); }
   .next-shift-banner.nsb-LAB .nsb-label{ color:#8fd0e8; }
-  .next-shift-banner.nsb-TRS{ background:linear-gradient(90deg, rgba(91,74,138,0.26), rgba(91,74,138,0.08)); border-color:rgba(91,74,138,0.48); border-left-color:#5b4a8a; }
+  .next-shift-banner.nsb-TRS{ background:linear-gradient(90deg, rgba(91,74,138,0.4), rgba(91,74,138,0.1)); border-color:rgba(91,74,138,0.65); border-left-color:#5b4a8a; box-shadow:0 3px 14px rgba(91,74,138,0.4); }
   .next-shift-banner.nsb-TRS .nsb-label{ color:#c7b6f0; }
-  .next-shift-banner.nsb-ADMIN{ background:linear-gradient(90deg, rgba(111,140,95,0.26), rgba(111,140,95,0.08)); border-color:rgba(111,140,95,0.48); border-left-color:var(--sage); }
+  .next-shift-banner.nsb-ADMIN{ background:linear-gradient(90deg, rgba(111,140,95,0.4), rgba(111,140,95,0.1)); border-color:rgba(111,140,95,0.65); border-left-color:var(--sage); box-shadow:0 3px 14px rgba(111,140,95,0.4); }
   .next-shift-banner.nsb-ADMIN .nsb-label{ color:#bcd6a6; }
-  .next-shift-banner.nsb-RDO{ background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.16); border-left-color:#8a8a8a; color:#c3cede; }
-  .next-shift-banner.nsb-HOL{ background:linear-gradient(90deg, rgba(184,134,63,0.26), rgba(184,134,63,0.08)); border-color:rgba(184,134,63,0.48); border-left-color:var(--amber); }
+  .next-shift-banner.nsb-RDO{ background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.16); border-left-color:#8a8a8a; color:#c3cede; box-shadow:none; }
+  .next-shift-banner.nsb-HOL{ background:linear-gradient(90deg, rgba(184,134,63,0.4), rgba(184,134,63,0.1)); border-color:rgba(184,134,63,0.65); border-left-color:var(--amber); box-shadow:0 3px 14px rgba(184,134,63,0.4); }
   .next-shift-banner.nsb-HOL .nsb-label{ color:#ecc48c; }
-  .next-shift-banner.nsb-SICK{ background:linear-gradient(90deg, rgba(193,68,44,0.26), rgba(193,68,44,0.08)); border-color:rgba(193,68,44,0.48); border-left-color:var(--today); }
+  .next-shift-banner.nsb-SICK{ background:linear-gradient(90deg, rgba(193,68,44,0.4), rgba(193,68,44,0.1)); border-color:rgba(193,68,44,0.65); border-left-color:var(--today); box-shadow:0 3px 14px rgba(193,68,44,0.4); }
   .next-shift-banner.nsb-SICK .nsb-label{ color:#f2ab97; }
 
   .my-head{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
   .my-head h2{ margin:0; font-size:20px; color:var(--navy); }
   .my-head-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .whoami{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); display:flex; align-items:center; gap:6px; }
-  .whoami select{ font-family:var(--mono); font-weight:700; font-size:12.5px; padding:4px 8px; border-radius:5px; border:1px solid var(--line); color:var(--navy); background:var(--panel); }
+  .whoami{ font-family:var(--mono); font-size:12px; font-weight:600; color:#fff; display:flex; align-items:center; gap:8px; background:linear-gradient(135deg, var(--amber), var(--clay)); padding:6px 12px 6px 14px; border-radius:20px; box-shadow:0 3px 10px rgba(184,134,63,0.4); }
+  .whoami select{ font-family:var(--mono); font-weight:800; font-size:12.5px; padding:4px 10px; border-radius:14px; border:1.5px solid rgba(255,255,255,0.5); color:var(--navy); background:#f6f2e8; }
   .tally-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(52px,1fr)); gap:8px; margin-bottom:18px; }
   .tally-card{ background:var(--panel); border:1.5px solid var(--grid-line); border-radius:8px; padding:10px 6px; text-align:center; }
   .tally-card.hours{ border-color:var(--teal); background:rgba(47,125,122,0.06); }
@@ -705,24 +708,33 @@ function baseName(n){ return (n||'').replace(/\(.*?\)/,'').trim(); }
    place (e.g. "DM Sick") rather than a person's initials, so it's kept out of the staff list. */
 function looksLikeInitials(tok){ return /^[A-Za-z]{1,4}$/.test(baseName(tok)); }
 const personColorCache = {};
-const PERSON_PALETTE = (function(){
-  const arr = [];
-  const count = 16;
-  for(let i=0;i<count;i++){
-    const hue = Math.round((360/count)*i);
-    const lightness = (i%2===0) ? 38 : 50;
-    arr.push(`hsl(${hue},70%,${lightness}%)`);
-  }
-  return arr;
-})();
+const personHueCache = {};
+const PERSON_HUE_COUNT = 16;
+function personHue(name){
+  if(!name) return 0;
+  if(personHueCache[name]!==undefined) return personHueCache[name];
+  let idx = STAFF.indexOf(name);
+  if(idx===-1) idx = Object.keys(personHueCache).length;
+  const hue = Math.round((360/PERSON_HUE_COUNT)*(idx % PERSON_HUE_COUNT));
+  personHueCache[name] = hue;
+  return hue;
+}
 function personColor(name){
   if(!name) return 'transparent';
   if(personColorCache[name]) return personColorCache[name];
-  let idx = STAFF.indexOf(name);
-  if(idx===-1) idx = Object.keys(personColorCache).length;
-  const color = PERSON_PALETTE[idx % PERSON_PALETTE.length];
+  const hue = personHue(name);
+  const idx = STAFF.indexOf(name);
+  const lightness = (idx>=0 && idx%2===0) ? 38 : 50;
+  const color = `hsl(${hue},70%,${lightness}%)`;
   personColorCache[name] = color;
   return color;
+}
+function personChipStyle(name){
+  const hue = personHue(name);
+  const isDark = state.theme==='dark';
+  const bg = isDark ? `hsl(${hue},55%,24%)` : `hsl(${hue},78%,83%)`;
+  const text = isDark ? `hsl(${hue},80%,84%)` : `hsl(${hue},88%,21%)`;
+  return `background:${bg};color:${text};font-weight:800;`;
 }
 function staffSet(){
   const s = new Set();
@@ -1284,8 +1296,9 @@ function renderGridView(){
         const base = baseName(n);
         const hi = state.staff && base===state.staff;
         const dim = state.staff && !hi;
-        const col = personColor(base);
-        return `<span class="initial ${hi?'hi':''} ${dim?'dim':''}" style="border-bottom:4px solid ${col};">${n}</span>`;
+        const chipStyle = personChipStyle(base);
+        const underline = personColor(base);
+        return `<span class="initial ${hi?'hi':''} ${dim?'dim':''}" style="${chipStyle}border-bottom:3px solid ${underline};">${n}</span>`;
       }).join(' ');
       return `<td class="${c.cls} shiftcell" data-month="${d.__month}" data-date="${d.date}" data-col="${c.key}">${inner}</td>`;
     }).join('');
@@ -1454,14 +1467,14 @@ function renderNextShiftBanner(){
   const future = myEntriesFor(state.me, allDays).filter(e => e.date >= todayStr);
   if(future.length===0){
     el.className = 'next-shift-banner empty';
-    el.innerHTML = `<span class="nsb-label">Next shift</span><span class="nsb-main">Nothing found for ${state.me} in the loaded months</span>`;
+    el.innerHTML = `<span class="nsb-name">${state.me}</span><span class="nsb-body"><span class="nsb-label">Next shift</span><span class="nsb-main">Nothing found in the loaded months</span></span>`;
     return;
   }
   const next = future[0];
   const isToday = next.date===todayStr;
   const dateLabel = new Date(next.date+"T00:00:00").toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'short'});
   el.className = 'next-shift-banner nsb-'+next.tag;
-  el.innerHTML = `<span class="nsb-label">Next shift · ${state.me}</span><span class="nsb-main">${isToday?'Today':dateLabel} — ${next.time}</span><span class="nsb-who">${next.raw.includes('(') ? next.raw.match(/\(.*?\)/)[0] : ''}</span>`;
+  el.innerHTML = `<span class="nsb-name">${state.me}</span><span class="nsb-body"><span class="nsb-label">Next shift</span><span class="nsb-main">${isToday?'Today':dateLabel} — ${next.time}</span></span><span class="nsb-who">${next.raw.includes('(') ? next.raw.match(/\(.*?\)/)[0] : ''}</span>`;
 }
 
 /* ---------------- CALENDAR EXPORT (.ics) ---------------- */
