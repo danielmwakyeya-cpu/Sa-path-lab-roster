@@ -119,7 +119,8 @@
   .dc-row.editable:hover{ background:rgba(47,125,122,0.08); }
   .dc-row.editable .dc-names::after{ content:" ✎"; color:var(--teal); font-size:12px; opacity:.7; }
   table.roster.editmode tbody td.shiftcell{ cursor:pointer; }
-  table.roster.editmode tbody td.shiftcell:hover{ outline:1.5px dashed var(--teal); outline-offset:-2px; }
+  table.roster.editmode tbody td.shiftcell{ outline:1.5px dashed rgba(47,125,122,0.45); outline-offset:-2px; }
+  table.roster.editmode tbody td.shiftcell:hover{ outline:1.5px dashed var(--teal); background:rgba(47,125,122,0.06); }
 
   .importbar{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:#fbf3e8; border:1px dashed var(--amber); border-radius:8px; padding:10px 14px; margin-bottom:14px; }
   html[data-theme="dark"] .importbar{ background:#241c10; }
@@ -285,6 +286,19 @@
   .next-shift-banner .nsb-main{ font-weight:700; color:#fff; }
   .next-shift-banner .nsb-who{ margin-left:auto; font-family:var(--mono); font-size:11px; font-weight:600; color:#dff2f0; background:rgba(255,255,255,0.08); padding:2px 9px; border-radius:10px; }
   .next-shift-banner.empty{ background:rgba(255,255,255,0.06); border-left-color:rgba(255,255,255,0.16); border-color:rgba(255,255,255,0.14); color:#a9b3c4; }
+  .next-shift-banner.nsb-ON{ background:linear-gradient(90deg, rgba(175,91,63,0.24), rgba(175,91,63,0.07)); border-color:rgba(175,91,63,0.45); border-left-color:var(--clay); }
+  .next-shift-banner.nsb-ON .nsb-label{ color:#f0b79c; }
+  .next-shift-banner.nsb-LAB{ background:linear-gradient(90deg, rgba(30,136,168,0.26), rgba(30,136,168,0.08)); border-color:rgba(30,136,168,0.48); border-left-color:#1e88a8; }
+  .next-shift-banner.nsb-LAB .nsb-label{ color:#8fd0e8; }
+  .next-shift-banner.nsb-TRS{ background:linear-gradient(90deg, rgba(91,74,138,0.26), rgba(91,74,138,0.08)); border-color:rgba(91,74,138,0.48); border-left-color:#5b4a8a; }
+  .next-shift-banner.nsb-TRS .nsb-label{ color:#c7b6f0; }
+  .next-shift-banner.nsb-ADMIN{ background:linear-gradient(90deg, rgba(111,140,95,0.26), rgba(111,140,95,0.08)); border-color:rgba(111,140,95,0.48); border-left-color:var(--sage); }
+  .next-shift-banner.nsb-ADMIN .nsb-label{ color:#bcd6a6; }
+  .next-shift-banner.nsb-RDO{ background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.16); border-left-color:#8a8a8a; color:#c3cede; }
+  .next-shift-banner.nsb-HOL{ background:linear-gradient(90deg, rgba(184,134,63,0.26), rgba(184,134,63,0.08)); border-color:rgba(184,134,63,0.48); border-left-color:var(--amber); }
+  .next-shift-banner.nsb-HOL .nsb-label{ color:#ecc48c; }
+  .next-shift-banner.nsb-SICK{ background:linear-gradient(90deg, rgba(193,68,44,0.26), rgba(193,68,44,0.08)); border-color:rgba(193,68,44,0.48); border-left-color:var(--today); }
+  .next-shift-banner.nsb-SICK .nsb-label{ color:#f2ab97; }
 
   .my-head{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
   .my-head h2{ margin:0; font-size:20px; color:var(--navy); }
@@ -691,13 +705,22 @@ function baseName(n){ return (n||'').replace(/\(.*?\)/,'').trim(); }
    place (e.g. "DM Sick") rather than a person's initials, so it's kept out of the staff list. */
 function looksLikeInitials(tok){ return /^[A-Za-z]{1,4}$/.test(baseName(tok)); }
 const personColorCache = {};
+const PERSON_PALETTE = (function(){
+  const arr = [];
+  const count = 16;
+  for(let i=0;i<count;i++){
+    const hue = Math.round((360/count)*i);
+    const lightness = (i%2===0) ? 38 : 50;
+    arr.push(`hsl(${hue},70%,${lightness}%)`);
+  }
+  return arr;
+})();
 function personColor(name){
   if(!name) return 'transparent';
   if(personColorCache[name]) return personColorCache[name];
-  let hash = 0;
-  for(let i=0;i<name.length;i++){ hash = (hash*31 + name.charCodeAt(i)) % 360; }
-  const hue = Math.abs(hash) % 360;
-  const color = `hsl(${hue}, 55%, 42%)`;
+  let idx = STAFF.indexOf(name);
+  if(idx===-1) idx = Object.keys(personColorCache).length;
+  const color = PERSON_PALETTE[idx % PERSON_PALETTE.length];
   personColorCache[name] = color;
   return color;
 }
@@ -1262,7 +1285,7 @@ function renderGridView(){
         const hi = state.staff && base===state.staff;
         const dim = state.staff && !hi;
         const col = personColor(base);
-        return `<span class="initial ${hi?'hi':''} ${dim?'dim':''}" style="border-bottom:2.5px solid ${col}">${n}</span>`;
+        return `<span class="initial ${hi?'hi':''} ${dim?'dim':''}" style="border-bottom:4px solid ${col};">${n}</span>`;
       }).join(' ');
       return `<td class="${c.cls} shiftcell" data-month="${d.__month}" data-date="${d.date}" data-col="${c.key}">${inner}</td>`;
     }).join('');
@@ -1437,7 +1460,7 @@ function renderNextShiftBanner(){
   const next = future[0];
   const isToday = next.date===todayStr;
   const dateLabel = new Date(next.date+"T00:00:00").toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'short'});
-  el.className = 'next-shift-banner';
+  el.className = 'next-shift-banner nsb-'+next.tag;
   el.innerHTML = `<span class="nsb-label">Next shift · ${state.me}</span><span class="nsb-main">${isToday?'Today':dateLabel} — ${next.time}</span><span class="nsb-who">${next.raw.includes('(') ? next.raw.match(/\(.*?\)/)[0] : ''}</span>`;
 }
 
@@ -2303,6 +2326,8 @@ document.getElementById('saveBtn').addEventListener('click', ()=>{
   render();
   const isFirstRun = await loadPersisted();
   applyTheme(state.theme);
+  const todayEntry = allDays.find(d=>d.date===todayStr);
+  if(todayEntry && months.includes(todayEntry.__month)) state.month = todayEntry.__month;
   render();
   if(isFirstRun && STAFF.length){
     const picked = await modalChoicePick('First time here', 'Who are you?', 'Pick your name so your shifts, swaps, and reminders line up correctly. You can change this anytime from the "My schedule" tab.', STAFF);
