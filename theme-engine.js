@@ -323,6 +323,34 @@ function overrideCss(p, dark, c, dens) {
   css += `nav.tabs button .count-dot,.sync-badge.error .sync-dot{color:${on(p.alert, eT)};}\n`;
   css += `.save-btn{background:${p.accent.t(k(28, 40))};color:${on(p.accent, k(28, 40))};}\n`;
 
+  /* Header sits on a dark accent gradient in BOTH modes, so its contents need a
+     colour derived from that fill, not from the page's ink. The roster's
+     .brand .tag inherits var(--amber), which is dark by design in light mode —
+     dark on dark. */
+  css += `header.top .brand .tag{color:${p.accent.t(88)};border-color:${p.accent.t(58)};}\n`;
+  css += `header.top .brand h1{color:${p.n.t(97)};}\n`;
+  css += `header.top .brand .sub,header.top .rangelabel{color:${p.nv.t(80)};}\n`;
+
+  /* The graph-paper background used var(--line), which was almost invisible
+     against the old cream paper but reads as hard ruling once the neutral
+     carries any hue. Give it its own, much quieter tone. */
+  const gridCol = p.nv.t(k(95, 11));
+  css += `body{background-image:linear-gradient(${gridCol} 1px,transparent 1px),` +
+         `linear-gradient(90deg,${gridCol} 1px,transparent 1px);}\n`;
+
+  /* Tally tiles fill with rgba() at 7% opacity, so the background grid shows
+     straight through them. Opaque tones instead. */
+  const TALLY = [['ON','warm'],['LAB','calm'],['TRS','other'],['ADMIN','good'],
+                 ['RDO','nv'],['HOL','accent']];
+  TALLY.forEach(([cls, pal]) => {
+    const P = p[pal];
+    css += `.tally-card.tc-${cls}{background:${P.t(k(96, 16))};border-color:${P.t(k(78, 38))};}\n`;
+    css += `.tally-card.tc-${cls} .t-num{color:${P.t(k(34, 80))};}\n`;
+  });
+  css += `.tally-card{background:${p.n.t(k(100, 13))};}\n`;
+  css += `.tally-card.hours{background:${p.calm.t(k(96, 16))};border-color:${p.calm.t(k(78, 38))};}\n`;
+  css += `.tally-card .t-num{color:${p.n.t(k(20, 90))};}\n`;
+
   /* Grid density. Only four rules, so scaling them here is safer than
      zooming the page, which breaks the sticky date column. */
   const D = DENSITY[dens] || DENSITY.comfortable;
